@@ -1,0 +1,149 @@
+{
+  "Environment": {
+    "Id": "Environments-623",
+    "Name": "prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-983",
+    "Name": "cmdemo1-app2-ui",
+    "Slug": "cmdemo1-app2-ui",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-355",
+    "Name": "cmdemo1 demo",
+    "Slug": "cmdemo1-demo"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-775",
+    "Name": "cmdemo1",
+    "Slug": "cmdemo1"
+  },
+  "Steps": [
+    {
+      "Id": "63a9c05a-9975-4c8e-b23a-37b62789b7b8",
+      "Slug": "sign-off",
+      "ActionType": "Octopus.Manual",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "0d1cf1f9-d52f-49b9-9803-d07cd897f2bb",
+      "Slug": "pin-version",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "c55cd41f-a145-4aec-b6e7-d2666c7e308e",
+      "Slug": "update-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "d5d602c9-6162-4c43-ba81-adc52ed4f31f",
+          "Name": "cmdemo1-app2-ui",
+          "Version": "2.4.7",
+          "Feed": {
+            "Id": "Feeds-1847",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "e0fcfdaf-b73c-473d-b376-f67c1acadb3a",
+      "Slug": "verify-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "cb68860b-33c0-44b6-bd01-48acafae05c4",
+      "Slug": "revert-pin",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "63a9c05a-9975-4c8e-b23a-37b62789b7b8"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "0d1cf1f9-d52f-49b9-9803-d07cd897f2bb"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "c55cd41f-a145-4aec-b6e7-d2666c7e308e"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "e0fcfdaf-b73c-473d-b376-f67c1acadb3a"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "cb68860b-33c0-44b6-bd01-48acafae05c4"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
+  },
+  "CreatedAt": "2026-10-05T00:51:27.786Z",
+  "Release": {
+    "Id": "Releases-49842",
+    "Name": "2.4.7",
+    "Version": "2.4.7"
+  }
+}

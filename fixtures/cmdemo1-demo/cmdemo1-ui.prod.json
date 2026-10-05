@@ -1,0 +1,308 @@
+{
+  "Environment": {
+    "Id": "Environments-623",
+    "Name": "prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-981",
+    "Name": "cmdemo1-ui",
+    "Slug": "cmdemo1-ui",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-355",
+    "Name": "cmdemo1 demo",
+    "Slug": "cmdemo1-demo"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-775",
+    "Name": "cmdemo1",
+    "Slug": "cmdemo1"
+  },
+  "Steps": [
+    {
+      "Id": "5dc3a569-d140-4737-9936-58c488701103",
+      "Slug": "sign-off",
+      "ActionType": "Octopus.Manual",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "6b5b6b5b-6b57-4eda-af9c-89747896cbb4",
+      "Slug": "record-restore-point",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "00d75213-341b-4993-a009-02c9069bfad0",
+      "Slug": "pin-version",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "0dbb316b-0204-4aa2-b3b8-faf70e272dd7",
+      "Slug": "migrate-database",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "1ea4e0b0-ceb6-4421-bb4b-177476fa27a6",
+          "Name": "ChurchBulletin.Database",
+          "Version": "2.4.31",
+          "Feed": {
+            "Id": "Feeds-1847",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "63629065-c1a3-4d85-9496-ee113545d2d9",
+      "Slug": "prepare-test-runner",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "61923b6f-4c35-410b-9c74-2c7212457515",
+      "Slug": "seed-demo-employees",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "5193fe77-5a19-49a6-bb05-4945aa60833b",
+          "Name": "ChurchBulletin.AcceptanceTests",
+          "Version": "2.4.31",
+          "Feed": {
+            "Id": "Feeds-1847",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "7b717bfa-9d41-4481-9761-a76b72508427",
+      "Slug": "update-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "ab158085-fe8c-4d43-ad3f-f4a7173fb2cb",
+      "Slug": "verify-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "c7ec3553-d9ce-4286-bb5a-61f150568a81",
+      "Slug": "revert-pin",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "824d414f-c823-4fca-9cdd-0ffe4537d937",
+      "Slug": "open-test-database",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "91993753-9b5a-43c5-9181-ed572ba8f24a",
+      "Slug": "acceptance-tests",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "12dd11e8-180a-4030-b17e-de2db4d890a9",
+          "Name": "ChurchBulletin.AcceptanceTests",
+          "Version": "2.4.31",
+          "Feed": {
+            "Id": "Feeds-1847",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "2fc1bba3-3e1c-4e95-825e-924528525865",
+      "Slug": "close-test-database",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "5dc3a569-d140-4737-9936-58c488701103"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "6b5b6b5b-6b57-4eda-af9c-89747896cbb4"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "00d75213-341b-4993-a009-02c9069bfad0"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "0dbb316b-0204-4aa2-b3b8-faf70e272dd7"
+      ]
+    },
+    {
+      "StartTrigger": "StartWithPrevious",
+      "Steps": [
+        "63629065-c1a3-4d85-9496-ee113545d2d9"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "61923b6f-4c35-410b-9c74-2c7212457515"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "7b717bfa-9d41-4481-9761-a76b72508427"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "ab158085-fe8c-4d43-ad3f-f4a7173fb2cb"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "c7ec3553-d9ce-4286-bb5a-61f150568a81"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "824d414f-c823-4fca-9cdd-0ffe4537d937"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "91993753-9b5a-43c5-9181-ed572ba8f24a"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "2fc1bba3-3e1c-4e95-825e-924528525865"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
+  },
+  "CreatedAt": "2026-10-05T00:42:46.093Z",
+  "Release": {
+    "Id": "Releases-49825",
+    "Name": "2.4.31",
+    "Version": "2.4.31"
+  }
+}

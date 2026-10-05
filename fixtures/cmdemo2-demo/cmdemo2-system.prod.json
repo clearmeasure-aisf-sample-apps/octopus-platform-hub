@@ -1,0 +1,130 @@
+{
+  "Environment": {
+    "Id": "Environments-642",
+    "Name": "prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-984",
+    "Name": "cmdemo2-system",
+    "Slug": "cmdemo2-system",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-356",
+    "Name": "cmdemo2 demo",
+    "Slug": "cmdemo2-demo"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-777",
+    "Name": "cmdemo2",
+    "Slug": "cmdemo2"
+  },
+  "Steps": [
+    {
+      "Id": "8f303eb7-8760-4d4f-982f-eb393abbc23d",
+      "Slug": "sign-off",
+      "ActionType": "Octopus.Manual",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "c16ed724-55a1-4684-a59e-7525f76544c2",
+      "Slug": "apply-environment",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "bfbe9893-6cd4-40f3-8fb6-37caa51ff5db",
+          "Name": "cmdemo2-system",
+          "Version": "1.0.16",
+          "Feed": {
+            "Id": "Feeds-1851",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "a4c4b14c-6ef8-42bd-8f4e-1dae15ca7782",
+      "Slug": "grant-database-access",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "95209e83-452e-429f-84db-1c84d07936ef",
+      "Slug": "verify-environment",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "8f303eb7-8760-4d4f-982f-eb393abbc23d"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "c16ed724-55a1-4684-a59e-7525f76544c2"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "a4c4b14c-6ef8-42bd-8f4e-1dae15ca7782"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "95209e83-452e-429f-84db-1c84d07936ef"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
+  },
+  "CreatedAt": "2026-10-05T09:37:28.784Z",
+  "Release": {
+    "Id": "Releases-49877",
+    "Name": "1.0.16",
+    "Version": "1.0.16"
+  }
+}

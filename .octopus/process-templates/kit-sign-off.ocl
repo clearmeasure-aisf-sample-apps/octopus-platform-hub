@@ -1,0 +1,34 @@
+name = "Kit - Sign-off"
+description = <<-EOT
+        The sign-off of the demo-environment kit's systems: a manual intervention that the responsible team answers before a release reaches an environment. People answer it in the Octopus UI; automation answers it as ai-ops with a recorded reason (invoke-demo-promotion.ps1 -Approve -Reason), which still counts as a sign-off.
+        <br /><br />
+        The project's usage step decides where it runs (the kit excludes the first environment, tdd) and passes the space's approvers team. The policy prod_has_sign_off accepts a step of this template as a production sign-off.
+        EOT
+
+icon {
+    color = "#0D80D8"
+    id = "user-check"
+}
+
+parameter "Template.SignOff.Teams" {
+    display_settings = {
+        Octopus.ControlType = "Teams"
+    }
+    help_text = "The team that answers the sign-off: the space's approvers team, `<slug> approvers` (kit decision D9), which holds ai-ops for automated sign-offs."
+    label = "Responsible teams"
+}
+
+step "sign-off" {
+    name = "Sign-off"
+
+    action {
+        action_type = "Octopus.Manual"
+        notes = "Waits until the responsible team proceeds, with a note, or aborts. It does not block other deployments meanwhile; the project's concurrency tag keeps one task per environment."
+        properties = {
+            Octopus.Action.Manual.BlockConcurrentDeployments = "False"
+            Octopus.Action.Manual.Instructions = "Sign off #{Octopus.Project.Name} #{Octopus.Release.Number} for #{Octopus.Environment.Name}: check the earlier environments, then Proceed with a note, or Abort."
+            Octopus.Action.Manual.ResponsibleTeamIds = "#{Template.SignOff.Teams}"
+            Octopus.Action.RunOnServer = "false"
+        }
+    }
+}

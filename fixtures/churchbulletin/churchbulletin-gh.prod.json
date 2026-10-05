@@ -1,0 +1,143 @@
+{
+  "Environment": {
+    "Id": "Environments-563",
+    "Name": "Prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-923",
+    "Name": "ChurchBulletin-gh",
+    "Slug": "churchbulletin-gh",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-315",
+    "Name": "ChurchBulletin",
+    "Slug": "churchbulletin"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-694",
+    "Name": "Default Project Group",
+    "Slug": "churchbulletin"
+  },
+  "Steps": [
+    {
+      "Id": "ensure-dotnet-10-installed",
+      "Slug": "ensure-dotnet-10-installed",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": true,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "open-firewall",
+      "Slug": "open-firewall",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": false,
+      "IsRequired": true,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "run-db-migrations",
+      "Slug": "run-db-migrations",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "blue-ring",
+          "Name": "ChurchBulletin.Database",
+          "Version": "2.4.3827"
+        }
+      ]
+    },
+    {
+      "Id": "close-firewall",
+      "Slug": "close-firewall",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": false,
+      "IsRequired": true,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "add-revision-to-container-app",
+      "Slug": "add-revision-to-container-app",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": true,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "ensure-dotnet-10-installed"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "open-firewall"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "run-db-migrations"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "close-firewall"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "add-revision-to-container-app"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-21",
+    "Username": "redacted-person",
+    "Type": "User"
+  },
+  "CreatedAt": "2026-10-05T05:56:12.710Z",
+  "Release": {
+    "Id": "Releases-49872",
+    "Name": "2.4.3827",
+    "Version": "2.4.3827",
+    "GitRef": "refs/heads/master"
+  }
+}

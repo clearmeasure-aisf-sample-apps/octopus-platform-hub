@@ -1,0 +1,84 @@
+# The checks of the Platform Hub repository, on every pull request and on main:
+# - policies: the Rego of .octopus/policies and tests/ passes opa fmt, opa check --strict and opa test
+#   (scripts/test.ps1); the compliance preview over fixtures/ is the job summary, and PREVIEW.md must be current;
+#   every .ocl file parses with Octopus's own OCL parser, which reads the same Rego that opa tested (tools/ocl-check).
+# - secret-scan: the demo-environment kit's standard secret scan (templates/app/.github/workflows/secret-scan.yml).
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  policies:
+    runs-on: ubuntu-latest
+    env:
+      OPA_VERSION: "1.21.1"
+      # sha256 of opa_linux_amd64_static of that release, as its opa_linux_amd64_static.sha256 publishes it.
+      OPA_SHA256: "668506eb17a2eaa1fce6cc0d1f42ef85125d4ac5bda5fc74d1152d0c77145031"
+      # OctopusDeploy/Ocl (Apache-2.0), main on 2026-08-28: the parser Octopus reads Platform Hub's OCL with.
+      OCL_COMMIT: "b01967bd1fb7adb86da740873631b1740a5d7d06"
+    steps:
+      - uses: actions/checkout@v6.0.1
+
+      - name: Install opa
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bin"
+          cd "$RUNNER_TEMP/bin"
+          curl -sSfL -o opa "https://github.com/open-policy-agent/opa/releases/download/v${OPA_VERSION}/opa_linux_amd64_static"
+          echo "${OPA_SHA256}  opa" | sha256sum -c -
+          chmod +x opa
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: opa fmt, opa check --strict, opa test
+        shell: pwsh
+        run: ./scripts/test.ps1
+
+      - name: Compliance preview
+        shell: pwsh
+        run: ./scripts/preview.ps1
+
+      - name: Job summary
+        run: cat PREVIEW.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: PREVIEW.md is current
+        run: |
+          if ! git diff --exit-code -- PREVIEW.md; then
+            echo "PREVIEW.md differs from what scripts/preview.ps1 writes: run it and commit the result."
+            exit 1
+          fi
+
+      - uses: actions/setup-dotnet@v6.0.0
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Octopus's OCL parser
+        run: |
+          set -euo pipefail
+          git init -q "$RUNNER_TEMP/ocl"
+          git -C "$RUNNER_TEMP/ocl" fetch -q --depth 1 https://github.com/OctopusDeploy/Ocl.git "$OCL_COMMIT"
+          git -C "$RUNNER_TEMP/ocl" checkout -q FETCH_HEAD
+          dotnet run --project tools/ocl-check -p:OclSource="$RUNNER_TEMP/ocl" -- .
+
+  # No secret in the repository (capability CAP-055): gitleaks over the whole history of the commit each pull request
+  # and push checks out (--log-opts=HEAD), not every branch, so a finding on one branch fails that branch only.
+  # The command-line tool, not gitleaks-action, which needs a license for organization repositories.
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.1
+        with:
+          fetch-depth: 0
+
+      - name: gitleaks
+        env:
+          GITLEAKS_VERSION: "8.30.1"
+        run: |
+          set -euo pipefail
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks git . --redact --no-banner --exit-code 1 --log-opts="HEAD"

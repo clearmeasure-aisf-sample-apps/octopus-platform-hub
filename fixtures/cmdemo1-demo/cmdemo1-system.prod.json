@@ -1,0 +1,149 @@
+{
+  "Environment": {
+    "Id": "Environments-623",
+    "Name": "prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-982",
+    "Name": "cmdemo1-system",
+    "Slug": "cmdemo1-system",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-355",
+    "Name": "cmdemo1 demo",
+    "Slug": "cmdemo1-demo"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-775",
+    "Name": "cmdemo1",
+    "Slug": "cmdemo1"
+  },
+  "Steps": [
+    {
+      "Id": "72882b26-ec20-4a1d-8ebe-bc1b127a0317",
+      "Slug": "sign-off",
+      "ActionType": "Octopus.Manual",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "012ef74d-d082-4481-92a2-4d6b1488d8a2",
+      "Slug": "apply-environment",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "a94dccee-2cc7-4edb-be5b-9531c4719125",
+          "Name": "cmdemo1-system",
+          "Version": "1.0.59",
+          "Feed": {
+            "Id": "Feeds-1847",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "5b6116c5-6e68-4cc6-b048-cfae216f3b17",
+      "Slug": "grant-database-access",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "253c4727-005b-49e7-b05c-517be3128d82",
+      "Slug": "set-employee-middle-names",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "31021c3e-5899-4b40-a824-81d437a0f54e",
+      "Slug": "verify-environment",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "72882b26-ec20-4a1d-8ebe-bc1b127a0317"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "012ef74d-d082-4481-92a2-4d6b1488d8a2"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "5b6116c5-6e68-4cc6-b048-cfae216f3b17"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "253c4727-005b-49e7-b05c-517be3128d82"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "31021c3e-5899-4b40-a824-81d437a0f54e"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
+  },
+  "CreatedAt": "2026-10-04T23:40:32.932Z",
+  "Release": {
+    "Id": "Releases-49830",
+    "Name": "1.0.59",
+    "Version": "1.0.59"
+  }
+}
