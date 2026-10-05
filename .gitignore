@@ -1,0 +1,5 @@
+# Extracted Rego and the OCL parser's checkout (scripts/policies.ps1, tools/ocl-check)
+build/
+# dotnet output of tools/ocl-check
+bin/
+obj/
