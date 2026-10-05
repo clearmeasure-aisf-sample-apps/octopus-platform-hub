@@ -128,10 +128,16 @@ test_a_disabled_restore_point_violates if {
 
 # Exemptions
 
-test_cmdemo3_is_exempt if {
+test_cmdemo3_without_a_restore_point_violates if {
 	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "prod", [sign_off, migrate, update], [])
-	result.allowed == true
-	result.reason == "Exempt: cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore."
+	result.allowed == false
+}
+
+test_a_data_step_is_not_a_database_change if {
+	middle_names := policy_input.step("middle-names-id", "set-employee-middle-names", "Octopus.AzurePowerShell")
+	initialize := policy_input.step("initialize-id", "initialize-database", "Octopus.Script")
+	result := policy.result with input as policy_input.deployment("cmdemo1-demo", "prod", [sign_off, middle_names, initialize, update], [])
+	result == {"allowed": true, "reason": "No database change runs in this deployment."}
 }
 
 test_cmdemo3_with_a_restore_point_complies if {

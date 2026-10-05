@@ -1,5 +1,5 @@
 name = "Deploy - Production database change has a restore point"
-description = "A production deployment of the demo systems (spaces whose slug ends in -demo) or of the bootcamp (space churchbulletin) that changes a database schema (step migrate-database or run-db-migrations, or the process template kit-migrate-database) records a restore point first (step record-restore-point, or the process template kit-record-restore-point), finished before the first change. Warn mode first (decision D5). Exempt: cmdemo3, whose SQL Server Express in the cluster has no point-in-time restore."
+description = "A production deployment of the demo systems (spaces whose slug ends in -demo) or of the bootcamp (space churchbulletin) that changes a database schema (step migrate-database or run-db-migrations, or the process template kit-migrate-database) records a restore point first (step record-restore-point, or the process template kit-record-restore-point), finished before the first change. Steps that change data but not the schema (for example Set employee middle names, Initialize database) are not database changes (decision 2026-10-05). Warn mode first (decision D5). No space is exempt: cmdemo3, once exempt, records a restore point since cmdemo3-system #14."
 violation_action = "warn"
 violation_reason = "A production database change needs a restore point recorded before it."
 
@@ -10,11 +10,15 @@ conditions {
             # Warn first everywhere (decision D5). The -demo spaces move to block after two clean weeks (plan phase 7).
             violation_action := "warn"
 
-            # Spaces exempt from this policy, each with its reason (decision D5, 2026-10-05).
-            exemptions := {"cmdemo3-demo": "cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore."}
+            # No space is exempt (decision D5): cmdemo3, exempt at first because SQL Server Express in its cluster has no
+            # point-in-time restore, records a verified backup before every prod deployment since cmdemo3-system #14
+            # (exemption removed 2026-10-05). To exempt a space again, add an exemptions map with its reason and the
+            # branch for it, as prod_has_sign_off does.
 
             # Steps that change a database schema, by step slug: the kit's "Migrate database" and the bootcamp's DbUp
             # step "Run DB migrations"; or any step of the process template kit-migrate-database (plan section 5.2).
+            # Steps that change data but not the schema (Set employee middle names, Initialize database, Seed demo
+            # employees) are not database changes here (decision 2026-10-05).
             database_change_slugs := {"migrate-database", "run-db-migrations"}
 
             database_change_templates := {"kit-migrate-database"}
@@ -30,8 +34,6 @@ conditions {
             	count(changes) == 0
             } else := {"allowed": true} if {
             	protected
-            } else := {"allowed": true, "reason": concat("", ["Exempt: ", exemptions[input.Space.Slug]])} if {
-            	exemptions[input.Space.Slug]
             } else := {"allowed": false, "action": violation_action, "reason": violation_reason}
 
             database_change(step) if step.Slug in database_change_slugs

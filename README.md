@@ -15,7 +15,7 @@ repository is connected to Octopus or published there. It is ready for the day t
 |---|---|---|---|
 | cmdemo1 | `cmdemo1 demo` (Spaces-355, slug `cmdemo1-demo`) | both | `kit-sign-off` once the kit uses it (plan phase 4) |
 | cmdemo2 | `cmdemo2 demo` (Spaces-356, slug `cmdemo2-demo`) | both | the same |
-| cmdemo3 | `cmdemo3 demo` (Spaces-357, slug `cmdemo3-demo`) | both; exempt from the restore point | the same |
+| cmdemo3 | `cmdemo3 demo` (Spaces-357, slug `cmdemo3-demo`) | both | the same |
 | bootcamp | `ChurchBulletin` (Spaces-315, slug `churchbulletin`), project `ChurchBulletin-gh` | both; exempt from the sign-off | only if its owners adopt them (D6) |
 
 The policies apply to every space whose slug ends in `-demo` (the demo-environment kit names each space
@@ -131,8 +131,10 @@ first.
 [PREVIEW.md](PREVIEW.md): both policies evaluated with `opa eval` over the fixtures, one row per system and project.
 On 2026-10-05, the eight production deployments of cmdemo1, cmdemo2 and cmdemo3 comply with both policies; the
 bootcamp is exempt from the sign-off and violates the restore-point rule (its step `run-db-migrations` changes the
-Prod database with no restore point first). The exemption of cmdemo3 is not used: since cmdemo3-system #14
-(2026-10-05) its step Record restore point takes a verified backup before every prod deployment.
+Prod database with no restore point first). cmdemo3, once exempt from the restore point, has no exemption any
+more: since cmdemo3-system #14 (2026-10-05) its step Record restore point takes a verified backup before every prod
+deployment. Steps that change data but not the schema (Set employee middle names, Initialize database) do not count as
+database changes (decision 2026-10-05).
 
 ## Fixtures
 
