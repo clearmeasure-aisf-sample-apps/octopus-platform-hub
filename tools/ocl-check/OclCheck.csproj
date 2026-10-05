@@ -1,0 +1,21 @@
+<!--
+  Parses every .ocl file of .octopus with Octopus's own OCL parser, OctopusDeploy/Ocl (Apache-2.0), compiled from
+  source: the library is not on NuGet. OclSource is a checkout of that repository at the commit check.yml pins.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>ocl-check</AssemblyName>
+    <OclSource Condition="'$(OclSource)' == ''">$(MSBuildThisFileDirectory)../../build/ocl</OclSource>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(OclSource)/source/Ocl/**/*.cs" />
+    <PackageReference Include="Sprache" Version="2.3.1" />
+  </ItemGroup>
+
+</Project>

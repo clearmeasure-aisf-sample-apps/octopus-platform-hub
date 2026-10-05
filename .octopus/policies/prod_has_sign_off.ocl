@@ -1,0 +1,70 @@
+name = "Deploy - Production has a sign-off"
+description = "Every production deployment of the demo systems (spaces whose slug ends in -demo) and of the bootcamp (space churchbulletin) runs a sign-off: an enabled, not skipped manual intervention (Octopus.Manual) or a step of the process template kit-sign-off. Warn mode first (decision D5). Exempt: the bootcamp, which has no Octopus approval by design."
+violation_action = "warn"
+violation_reason = "A production deployment needs a sign-off that runs: an enabled manual intervention (Octopus.Manual) or the kit-sign-off process template, not skipped."
+
+conditions {
+    rego = <<-EOT
+            package prod_has_sign_off
+
+            # Warn first everywhere (decision D5). The -demo spaces move to block after two clean weeks (plan phase 7).
+            violation_action := "warn"
+
+            # Spaces exempt from this policy, each with its reason (decision D5, 2026-10-05).
+            exemptions := {"churchbulletin": "the bootcamp has no Octopus approval by design: its master builds reach Prod after the TDD acceptance tests and the GitHub environment wait timers."}
+
+            default result := {"allowed": false, "action": "warn", "reason": "A production deployment needs a sign-off that runs."}
+
+            result := {"allowed": true} if {
+            	count(running_sign_offs) > 0
+            } else := {"allowed": true, "reason": concat("", ["Exempt: ", exemptions[input.Space.Slug]])} if {
+            	exemptions[input.Space.Slug]
+            } else := {"allowed": false, "action": violation_action, "reason": violation_reason}
+
+            # A sign-off: a manual intervention, or a step of the process template kit-sign-off.
+            sign_off(step) if step.ActionType == "Octopus.Manual"
+
+            sign_off(step) if {
+            	step.Source.Type == "Process Template"
+            	step.Source.SlugOrId == "kit-sign-off"
+            }
+
+            # A step runs in this deployment when it is enabled and not skipped.
+            runs(step) if {
+            	step.Enabled
+            	not step.Id in input.SkippedSteps
+            }
+
+            sign_off_steps := [step | some step in input.Steps; sign_off(step)]
+
+            running_sign_offs := [step.Slug | some step in sign_off_steps; runs(step)]
+
+            violation_reason := "No sign-off in this production deployment: add an enabled manual intervention (Octopus.Manual) or the kit-sign-off process template." if {
+            	count(sign_off_steps) == 0
+            } else := sprintf("The sign-off of this production deployment does not run: %s.", [concat("; ", [not_running(step) | some step in sign_off_steps])])
+
+            not_running(step) := sprintf("step %s is disabled", [step.Slug]) if {
+            	not step.Enabled
+            } else := sprintf("step %s is skipped", [step.Slug])
+            EOT
+}
+
+scope {
+    rego = <<-EOT
+            package prod_has_sign_off
+
+            # Deployments to prod in the spaces of the kit's demo systems (the kit names each space "<slug> demo", so
+            # its slug ends in -demo) and in the bootcamp's space ChurchBulletin. Runbook runs are out of scope.
+            default evaluate := false
+
+            evaluate if {
+            	not input.Runbook
+            	input.Environment.Slug == "prod"
+            	in_scope_space
+            }
+
+            in_scope_space if endswith(input.Space.Slug, "-demo")
+
+            in_scope_space if input.Space.Slug == "churchbulletin"
+            EOT
+}

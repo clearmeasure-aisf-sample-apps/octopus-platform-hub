@@ -1,0 +1,136 @@
+{
+  "Environment": {
+    "Id": "Environments-627",
+    "Name": "prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-986",
+    "Name": "cmdemo3-system",
+    "Slug": "cmdemo3-system",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-357",
+    "Name": "cmdemo3 demo",
+    "Slug": "cmdemo3-demo"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-779",
+    "Name": "cmdemo3",
+    "Slug": "cmdemo3"
+  },
+  "Steps": [
+    {
+      "Id": "20c6a736-7c21-4124-810e-aa0dc76e0521",
+      "Slug": "sign-off",
+      "ActionType": "Octopus.Manual",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "d4d50d05-6819-4d5e-b6da-dd28ddaaefa6",
+      "Slug": "prepare-environment",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "d6e99e7c-0aac-431e-9d0f-5b3a2344ce50",
+      "Slug": "apply-environment",
+      "ActionType": "Octopus.ArgoCDUpdateManifests",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "d954c908-2b1e-46a9-ba8f-566b6dbfa67b",
+      "Slug": "initialize-database",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "213d372c-9d5d-4f24-aa9d-fcb74f5f8c88",
+      "Slug": "verify-environment",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "20c6a736-7c21-4124-810e-aa0dc76e0521"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "d4d50d05-6819-4d5e-b6da-dd28ddaaefa6"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "d6e99e7c-0aac-431e-9d0f-5b3a2344ce50"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "d954c908-2b1e-46a9-ba8f-566b6dbfa67b"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "213d372c-9d5d-4f24-aa9d-fcb74f5f8c88"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
+  },
+  "CreatedAt": "2026-10-05T09:37:04.434Z",
+  "Release": {
+    "Id": "Releases-49879",
+    "Name": "1.0.12",
+    "Version": "1.0.12"
+  }
+}

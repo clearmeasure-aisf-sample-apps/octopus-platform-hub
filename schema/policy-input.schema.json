@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Octopus Policy input schema",
+  "type": "object",
+  "properties": {
+    "Environment": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Slug": { "type": "string" },
+        "Tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["Id", "Name", "Slug", "Tags"]
+    },
+    "Project": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Slug": { "type": "string" },
+        "Tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["Id", "Name", "Slug", "Tags"]
+    },
+    "Space": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Slug": { "type": "string" }
+      },
+      "required": ["Id", "Name", "Slug"]
+    },
+    "Tenant": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Slug": { "type": "string" },
+        "Tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["Id", "Name", "Slug", "Tags"]
+    },
+    "ProjectGroup": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Slug": { "type": "string" }
+      },
+      "required": ["Id", "Name", "Slug"]
+    },
+    "SkippedSteps": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "Steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Id": { "type": "string" },
+          "Slug": { "type": "string" },
+          "ActionType": { "type": "string" },
+          "Enabled": { "type": "boolean" },
+          "IsRequired": { "type": "boolean" },
+          "IsConditional": { "type": "boolean" },
+          "Source": {
+            "type": "object",
+            "properties": {
+              "Type": { "type": "string" },
+              "SlugOrId": { "type": "string" },
+              "Version": { "type": "string" }
+            },
+            "required": ["Type", "SlugOrId"]
+          },
+          "Packages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": { "type": "string" },
+                "Name": { "type": "string" },
+                "Version": { "type": "string" },
+                "GitRef": { "type": "string" },
+                "Feed": {
+                  "type": "object",
+                  "properties": {
+                    "Id": { "type": "string" },
+                    "Name": { "type": "string" },
+                    "Slug": { "type": "string" },
+                    "Uri": { "type": "string" },
+                    "Type": { "type": "string" },
+                    "Source": { "type": "string" }
+                  },
+                  "required": ["Id", "Name", "Slug", "Type", "Source"]
+                }
+              },
+              "required": ["Id", "Name"]
+            }
+          }
+        },
+        "required": ["Id", "Slug", "ActionType", "Enabled", "IsRequired", "IsConditional", "Source"]
+      }
+    },
+    "Release": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Version": { "type": "string" },
+        "GitRef": { "type": "string" }
+      },
+      "required": ["Id", "Name", "Version"]
+    },
+    "Runbook": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Name": { "type": "string" },
+        "Snapshot": { "type": "string" },
+        "GitRef": { "type": "string" }
+      },
+      "required": ["Id", "Name", "Snapshot"]
+    },
+    "Execution": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "StartTrigger": { "type": "string" },
+          "Steps": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["StartTrigger", "Steps"]
+      }
+    },
+    "RequiresApproval": { "type": "boolean" },
+    "Actor": {
+      "type": "object",
+      "properties": {
+        "Id": { "type": "string" },
+        "Username": { "type": "string" },
+        "Type": { "type": "string" }
+      },
+      "required": ["Id", "Username", "Type"]
+    },
+    "CreatedAt": { "type": "string" }
+  },
+  "required": [
+    "Environment",
+    "Project",
+    "Space",
+    "SkippedSteps",
+    "Steps",
+    "ProjectGroup",
+    "Execution",
+    "RequiresApproval",
+    "Actor",
+    "CreatedAt"
+  ]
+}

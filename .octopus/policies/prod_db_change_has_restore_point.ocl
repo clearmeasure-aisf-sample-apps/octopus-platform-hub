@@ -1,0 +1,123 @@
+name = "Deploy - Production database change has a restore point"
+description = "A production deployment of the demo systems (spaces whose slug ends in -demo) or of the bootcamp (space churchbulletin) that changes a database schema (step migrate-database or run-db-migrations, or the process template kit-migrate-database) records a restore point first (step record-restore-point, or the process template kit-record-restore-point), finished before the first change. Warn mode first (decision D5). Exempt: cmdemo3, whose SQL Server Express in the cluster has no point-in-time restore."
+violation_action = "warn"
+violation_reason = "A production database change needs a restore point recorded before it."
+
+conditions {
+    rego = <<-EOT
+            package prod_db_change_has_restore_point
+
+            # Warn first everywhere (decision D5). The -demo spaces move to block after two clean weeks (plan phase 7).
+            violation_action := "warn"
+
+            # Spaces exempt from this policy, each with its reason (decision D5, 2026-10-05).
+            exemptions := {"cmdemo3-demo": "cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore."}
+
+            # Steps that change a database schema, by step slug: the kit's "Migrate database" and the bootcamp's DbUp
+            # step "Run DB migrations"; or any step of the process template kit-migrate-database (plan section 5.2).
+            database_change_slugs := {"migrate-database", "run-db-migrations"}
+
+            database_change_templates := {"kit-migrate-database"}
+
+            # Steps that record a restore point: the kit's "Record restore point", or the template kit-record-restore-point.
+            restore_point_slugs := {"record-restore-point"}
+
+            restore_point_templates := {"kit-record-restore-point"}
+
+            default result := {"allowed": false, "action": "warn", "reason": "A production database change needs a restore point recorded before it."}
+
+            result := {"allowed": true, "reason": "No database change runs in this deployment."} if {
+            	count(changes) == 0
+            } else := {"allowed": true} if {
+            	protected
+            } else := {"allowed": true, "reason": concat("", ["Exempt: ", exemptions[input.Space.Slug]])} if {
+            	exemptions[input.Space.Slug]
+            } else := {"allowed": false, "action": violation_action, "reason": violation_reason}
+
+            database_change(step) if step.Slug in database_change_slugs
+
+            database_change(step) if {
+            	step.Source.Type == "Process Template"
+            	step.Source.SlugOrId in database_change_templates
+            }
+
+            restore_point(step) if step.Slug in restore_point_slugs
+
+            restore_point(step) if {
+            	step.Source.Type == "Process Template"
+            	step.Source.SlugOrId in restore_point_templates
+            }
+
+            # A step runs in this deployment when it is enabled and not skipped.
+            runs(step) if {
+            	step.Enabled
+            	not step.Id in input.SkippedSteps
+            }
+
+            # Positions in input.Steps (the process order) of the database changes and restore points that run.
+            changes := [i | some i, step in input.Steps; database_change(step); runs(step)]
+
+            restore_points := [i | some i, step in input.Steps; restore_point(step); runs(step)]
+
+            first_change := min(changes)
+
+            protected if {
+            	some i in restore_points
+            	finishes_before(i, first_change)
+            }
+
+            # Step i finishes before step j starts: it comes first, and an execution group after its own, up to and
+            # including j's, waits for the steps before it (StartAfterPrevious) instead of starting with them.
+            finishes_before(i, j) if {
+            	i < j
+            	not parallel(input.Steps[i].Id, input.Steps[j].Id)
+            }
+
+            parallel(a, b) if {
+            	group_a := group(a)
+            	group_b := group(b)
+            	group_a < group_b
+            	waits := [g | some g, execution in input.Execution; g > group_a; g <= group_b; execution.StartTrigger == "StartAfterPrevious"]
+            	count(waits) == 0
+            }
+
+            group(id) := g if {
+            	some g, execution in input.Execution
+            	id in execution.Steps
+            }
+
+            restore_point_steps := [step | some step in input.Steps; restore_point(step)]
+
+            change := input.Steps[first_change].Slug
+
+            violation_reason := sprintf("Step %s changes the database with no restore point before it: add the step record-restore-point or the process template kit-record-restore-point before the first database change.", [change]) if {
+            	count(restore_point_steps) == 0
+            } else := sprintf("Step %s changes the database, but its restore point does not run: %s.", [change, concat("; ", [not_running(step) | some step in restore_point_steps])]) if {
+            	count(restore_points) == 0
+            } else := sprintf("Step %s changes the database before the restore point (%s) has finished.", [change, concat(", ", [input.Steps[i].Slug | some i in restore_points])])
+
+            not_running(step) := sprintf("step %s is disabled", [step.Slug]) if {
+            	not step.Enabled
+            } else := sprintf("step %s is skipped", [step.Slug])
+            EOT
+}
+
+scope {
+    rego = <<-EOT
+            package prod_db_change_has_restore_point
+
+            # Deployments to prod in the spaces of the kit's demo systems (the kit names each space "<slug> demo", so
+            # its slug ends in -demo) and in the bootcamp's space ChurchBulletin. Runbook runs are out of scope.
+            default evaluate := false
+
+            evaluate if {
+            	not input.Runbook
+            	input.Environment.Slug == "prod"
+            	in_scope_space
+            }
+
+            in_scope_space if endswith(input.Space.Slug, "-demo")
+
+            in_scope_space if input.Space.Slug == "churchbulletin"
+            EOT
+}
