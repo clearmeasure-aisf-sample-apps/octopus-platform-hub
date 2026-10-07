@@ -9,6 +9,7 @@
     Extracts each policy's conditions and scope Rego to build/rego/<slug>/ (scripts/policies.ps1), then checks:
       - opa fmt: the Rego in the policy files and the tests are formatted;
       - layout: each policy file is in the canonical layout of the Octopus UI's writer;
+      - no user-defined functions in a policy's Rego: Octopus does not accept them;
       - opa check --strict over build/rego and tests;
       - opa test over build/rego and tests.
     The CI workflow check.yml runs it on every pull request and on main.
@@ -66,6 +67,23 @@ foreach ($policy in $policies) {
         Write-Host "FAIL $relative is not in the canonical layout (run scripts/test.ps1 -Fix)"
     }
     else { Write-Host "PASS $relative" }
+}
+
+# Octopus refuses a policy with a user-defined function ("User-defined functions are not supported", at the first
+# publish on 2026-10-07); opa accepts them, so this check is the only thing that catches one before a publish.
+Write-Host "==> no user-defined functions"
+foreach ($policy in $policies) {
+    foreach ($block in 'conditions', 'scope') {
+        $lines = [IO.File]::ReadAllLines((Join-Path $build $policy.Slug "$block.rego"))
+        $functions = @(for ($number = 0; $number -lt $lines.Count; $number++) {
+                if ($lines[$number] -cmatch '^(default\s+)?[a-z_][A-Za-z0-9_]*\(') { "$block line $($number + 1): $($lines[$number].Trim())" }
+            })
+        if ($functions.Count -gt 0) {
+            $failures++
+            foreach ($function in $functions) { Write-Host "FAIL $($policy.Slug) defines a function, which Octopus does not accept ($function): use a rule that is a value, a set or an array" }
+        }
+        else { Write-Host "PASS $($policy.Slug) $block" }
+    }
 }
 
 Write-Host "==> opa check --strict"
