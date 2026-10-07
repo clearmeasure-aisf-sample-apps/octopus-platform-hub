@@ -4,10 +4,31 @@ The [Platform Hub](https://octopus.com/docs/platform-hub) repository of the Octo
 https://clearmeasure.octopus.app. Platform Hub reads one Git repository for the whole instance; this repository is the
 only source of the instance's process templates and policies (decision D2 of the Platform Hub plan).
 
-**Status: not connected.** Platform Hub needs the Enterprise tier, which the instance does not have yet: every
-`/api/platformhub/...` endpoint answers that its feature is "only available on the Enterprise tier". Nothing in this
-repository is connected to Octopus or published there. It is ready for the day the licence changes; see
-[How it gets connected](#how-it-gets-connected).
+**Status: connected since 2026-10-07; both policies active in warn mode.**
+
+- **Version control.** Platform Hub reads this repository at `main`, base path `.octopus`, with the default branch
+  protected and **no credentials**: the repository is public, so Octopus only reads. Nothing can be saved from the
+  Octopus UI; a policy or a template changes here, by pull request. (A Platform Hub GitHub App connection, which
+  would let the UI open branches, needs a person signed in to GitHub: a service account cannot create one.)
+- **Policies.** `prod_has_sign_off` and `prod_db_change_has_restore_point` are published as 1.0.0 (commit `34d1224`)
+  and active. Both warn and block nothing.
+- **Seen at work** in a throwaway space (`cmprobe demo`, deleted afterwards), four prod deployments:
+
+  | Process | Sign-off policy | Restore-point policy | Task |
+  |---|---|---|---|
+  | Sign-off, Record restore point, Migrate database | compliant | compliant | Success, no warning |
+  | Sign-off, Update deployable | compliant | compliant ("No database change runs in this deployment.", at Info level) | Success, no warning |
+  | Migrate database only | warning with the policy's reason | warning with the policy's reason | Success with warnings; the deployment went on |
+  | Sign-off and Record restore point scoped to uat only, Migrate database | compliant | compliant | Success, no warning: **see the limit below** |
+
+- **The limit Octopus has.** `input.Steps` lists every step of the process, also a step whose environment scope
+  leaves this deployment out; such a step has `Enabled: true` and `IsConditional: true`, exactly like a step scoped to
+  include it. A policy cannot tell a sign-off that runs in prod from one scoped away from it. The demo-environment
+  kit's fleet reads the process with its scopes and reports that case (`policy/<slug>/<project>/sign-off` and
+  `.../restore-point` of `test-fleet.ps1`); the policies here catch what the fleet cannot see, a step disabled or
+  skipped in one deployment. Both stay.
+- **Not done:** the process template `kit-sign-off` is still a draft and shared with no space;
+  [How it gets connected](#how-it-gets-connected) keeps the remaining steps.
 
 ## What it serves
 
@@ -193,36 +214,41 @@ Every change comes by pull request.
 
 Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before any template is used.
 
-1. **Licence (1.1, Jeffrey).** The instance moves to Enterprise. Check: `GET /api/platformhub/versioncontrol` answers
-   200 instead of the tier error.
+1. **Licence (1.1, Jeffrey).** Done: `GET /api/platformhub/versioncontrol` answers 200 since 2026-10-06.
 2. **Repository (1.2, operator).** This repository and its check workflow exist. Still to add: a ruleset on `main`
    (pull request and the required checks `policies` and `secret-scan`).
-3. **Version Control (1.3).** In Platform Hub > GitHub Connections, a Platform Hub GitHub App connection for this
-   repository; then Platform Hub > Version Control: GitHub, this repository, base path `.octopus`, default branch
-   `main`, protected default branch, so edits in the UI go through a branch and a pull request. Never a personal
-   token. Check: `GET /api/platformhub/versioncontrol` shows this repository and `GET /api/platformhub/git/branches`
-   lists `main`.
-4. **Policies (3.2, operator).** `GET /api/platformhub/main/policies` lists both policies. Replay each in the
-   Evaluations tab against the last weeks of runs and compare with [PREVIEW.md](PREVIEW.md); compare a fixture with
-   the Evaluations tab's View of the same deployment. Publish 1.0.0 (a first publish is a major version), activate,
-   and watch the next promotions (3.3).
+3. **Version Control (1.3).** Done on 2026-10-07 by the operator through the API (`PUT /api/platformhub/versioncontrol`):
+   this repository, base path `.octopus`, default branch `main`, protected, credentials Anonymous. Still open: a
+   Platform Hub GitHub App connection (Platform Hub > GitHub Connections, by a person signed in to GitHub), only
+   needed if edits from the Octopus UI are wanted. Never a personal token.
+4. **Policies (3.2, operator).** Done on 2026-10-07: both published as 1.0.0 and activated
+   (`POST /api/platformhub/<ref>/policies/<slug>/publish`, then `.../versions/1.0.0/modify-status`), after the four
+   deployments above. The first publish was refused ("User-defined functions are not supported"), which
+   `scripts/test.ps1` now checks. Not done: the replay in the Evaluations tab against earlier runs (the API has no
+   endpoint for it). Next: watch the promotions to prod of the demo systems (3.3); a deployment that complies logs
+   "Compliant with policy ..." under "Apply compliance policies".
 5. **Templates (phase 4).** After the spike: publish `kit-sign-off` 1.0.0 as a pre-release, share it with the canary
    space only, and remove its DRAFT mark here.
 
-## Open questions for the licence day
+## Open questions for the licence day, with the answers of 2026-10-07
 
 1. Does `Steps` list every step of the process, or only the steps that run in the deployment's environment, channel
    and tenant? The fixtures list every step. If Octopus does too, `prod_has_sign_off` cannot tell a sign-off scoped
    away from prod from one that runs there.
+   **Answer:** every step of the process, whatever its environment scope (the fourth deployment above). So neither policy can tell a step scoped away from prod; the kit's fleet covers that.
 2. What does `IsConditional` cover: the run condition only, or also a scope by environment, channel or tenant? The
    kit's Sign-off and Record restore point are scoped by environment. Neither policy reads the field; the docs' best
    practice `step.IsConditional == false` would flag every kit Sign-off under the broad reading.
+   **Answer:** the broad reading: a step with an environment scope has `IsConditional: true`. The policies must go on not reading it.
 3. What `Source` holds for a built-in step. The docs' examples compare `Source.SlugOrId` with a step slug; the
    policies match built-in steps by `Slug` and `ActionType` and do not depend on it.
+   **Answer:** `{"Type": "Step", "SlugOrId": "<the step's slug>"}`.
 4. `Packages[].Name` (package ID or package reference name) and the format of `GitRef`; `Release.Name`.
 5. Which Rego engine and version Octopus runs (the Windows note on a missing Visual C++ runtime suggests a native
    engine). The policies use only common Rego v1: `if`, `in`, `contains`, `else`, comprehensions, `count`, `min`,
    `sprintf`, `concat`, `endswith`.
+   **Answer:** not known by name, but it refuses user-defined functions at publish. Values, sets, arrays, comprehensions, `some ... in`, `not`, `count`, `min`, `sprintf` and `concat` are accepted and evaluate as opa does.
 6. How the task log and audit log show an allowed result that carries a `reason` (exempt, no database change).
+   **Answer:** an allowed result with a reason logs "Compliant with policy \"...\" (<reason>)" at Info level: no warning. A violation in warn mode logs a Warning with the reason, and the task ends Success with warnings.
 7. Whether Octopus accepts the Git-authored `kit-sign-off.ocl` as it is (name, icon, Teams parameter), and the spike
    items 2 (an exact version as mask) and 5 (its manual intervention answered through `/interruptions`).
