@@ -50,6 +50,7 @@ instance is in their scope.
   policies/
     prod_has_sign_off.ocl                policy, warn mode
     prod_db_change_has_restore_point.ocl policy, warn mode
+    app_deployment_has_health_check.ocl  policy, warn mode
   process-templates/
     cmdemo-process-template.ocl          process template, DRAFT
 fixtures/                                the policy input of real deployments, and manifest.json
@@ -92,6 +93,7 @@ policy version.
 |---|---|---|
 | [`prod_has_sign_off`](.octopus/policies/prod_has_sign_off.ocl) "Deploy - Production has a sign-off" | A production deployment has a sign-off that runs: an enabled, not skipped step of type `Octopus.Manual`, or a step of the process template `cmdemo-process-template` | `churchbulletin`: the bootcamp has no Octopus approval by design; its master builds reach Prod after the TDD acceptance tests and the GitHub environment wait timers |
 | [`prod_db_change_has_restore_point`](.octopus/policies/prod_db_change_has_restore_point.ocl) "Deploy - Production database change has a restore point" | A production deployment whose process changes a database schema (step `migrate-database`, the bootcamp's `run-db-migrations`, or a step of the template `kit-migrate-database`) records a restore point first (step `record-restore-point`, or the template `kit-record-restore-point`), finished before the first change | `cmdemo3-demo`: cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore |
+| [`app_deployment_has_health_check`](.octopus/policies/app_deployment_has_health_check.ocl) "Deploy - Application deployment has a health check" | In the spaces whose slug ends in `-demo`, a deployment that updates an application (step `update-deployable`), to any environment, asks the application's health endpoint afterwards: a step `verify-deployable` that is enabled, not skipped, and starts after the last update step has finished. A deployment that updates no application complies. Warn mode | None. The bootcamp's space is out of scope, not exempt: its process has no health check step, and its owners decide whether it gets one |
 
 - **Scope** (both): deployments, not runbook runs (`not input.Runbook`), to the environment `prod`, in a space whose
   slug ends in `-demo` or is `churchbulletin`.
