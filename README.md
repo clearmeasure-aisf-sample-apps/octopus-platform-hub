@@ -8,8 +8,8 @@ only source of the instance's process templates and policies (decision D2 of the
 
 - **Version control.** Platform Hub reads this repository at `main`, base path `.octopus`, with the default branch
   protected and **no credentials**: the repository is public, so Octopus only reads. Nothing can be saved from the
-  Octopus UI; a policy or a template changes here, by pull request. (A Platform Hub GitHub App connection, which
-  would let the UI open branches, needs a person signed in to GitHub: a service account cannot create one.)
+  Octopus UI; a policy or a template changes here, by pull request. That is the decision (Jeffrey, 2026-10-07):
+  no edits from the Octopus UI, so no Platform Hub GitHub App connection is made.
 - **Policies.** `prod_has_sign_off` and `prod_db_change_has_restore_point` are published as 1.0.0 (commit `34d1224`)
   and active. Both warn and block nothing.
 - **Seen at work** in a throwaway space (`cmprobe demo`, deleted afterwards), four prod deployments:
@@ -218,9 +218,10 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
 2. **Repository (1.2, operator).** This repository and its check workflow exist. Still to add: a ruleset on `main`
    (pull request and the required checks `policies` and `secret-scan`).
 3. **Version Control (1.3).** Done on 2026-10-07 by the operator through the API (`PUT /api/platformhub/versioncontrol`):
-   this repository, base path `.octopus`, default branch `main`, protected, credentials Anonymous. Still open: a
-   Platform Hub GitHub App connection (Platform Hub > GitHub Connections, by a person signed in to GitHub), only
-   needed if edits from the Octopus UI are wanted. Never a personal token.
+   this repository, base path `.octopus`, default branch `main`, protected, credentials Anonymous. No Platform Hub
+   GitHub App connection: policies and templates are edited here, never from the Octopus UI (decision 2026-10-07).
+   Should that change, a person signed in to GitHub creates the connection (a service account cannot); never a
+   personal token.
 4. **Policies (3.2, operator).** Done on 2026-10-07: both published as 1.0.0 and activated
    (`POST /api/platformhub/<ref>/policies/<slug>/publish`, then `.../versions/1.0.0/modify-status`), after the four
    deployments above. The first publish was refused ("User-defined functions are not supported"), which
