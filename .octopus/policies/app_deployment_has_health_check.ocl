@@ -1,0 +1,146 @@
+name = "Deploy - Application deployment has a health check"
+description = "Every deployment of an application of the demo systems (spaces whose slug ends in -demo), to any environment, asks the deployed application's health endpoint after the application is updated: a step verify-deployable that is enabled, not skipped, and starts after the last step update-deployable has finished. A deployment that updates no application (a system project) complies. Warn mode first (decision D5). The bootcamp's space is out of scope: its process has no health check step."
+violation_action = "warn"
+violation_reason = "An application deployment needs a health check after the application is updated."
+
+conditions {
+    rego = <<-EOT
+            package app_deployment_has_health_check
+
+            # No user-defined functions: Octopus refuses them at publish. Every rule is a value, a set or an array.
+
+            # Warn first (decision D5), as the other policies.
+            violation_action := "warn"
+
+            # The steps that put a new version of an application in service, by step slug: the kit's "Update deployable"
+            # (a container app, an app on App Service, a static site, an image tag for Argo CD).
+            deploy_slugs := {"update-deployable"}
+
+            # The steps that ask the deployed application's health endpoint until it answers: the kit's "Verify deployable".
+            health_check_slugs := {"verify-deployable"}
+
+            default result := {"allowed": false, "action": "warn", "reason": "An application deployment needs a health check after the application is updated."}
+
+            result := {"allowed": true, "reason": "No application is deployed in this deployment."} if {
+            	count(deploys) == 0
+            }
+
+            result := {"allowed": true} if {
+            	count(deploys) > 0
+            	checked
+            }
+
+            result := {"allowed": false, "action": violation_action, "reason": violation_reason} if {
+            	count(deploys) > 0
+            	not checked
+            }
+
+            deploy_ids contains step.Id if {
+            	some step in input.Steps
+            	step.Slug in deploy_slugs
+            }
+
+            health_check_ids contains step.Id if {
+            	some step in input.Steps
+            	step.Slug in health_check_slugs
+            }
+
+            # A step runs in this deployment when it is enabled and not skipped.
+            running_ids contains step.Id if {
+            	some step in input.Steps
+            	step.Enabled
+            	not step.Id in input.SkippedSteps
+            }
+
+            # Positions in input.Steps (the process order) of the deploy steps and health checks that run.
+            deploys := [i |
+            	some i, step in input.Steps
+            	step.Id in deploy_ids
+            	step.Id in running_ids
+            ]
+
+            health_checks := [i |
+            	some i, step in input.Steps
+            	step.Id in health_check_ids
+            	step.Id in running_ids
+            ]
+
+            last_deploy := max(deploys)
+
+            # A health check counts when it comes after the last deploy step and starts once that step has finished.
+            checked if {
+            	some i in health_checks
+            	i > last_deploy
+            	not i in starts_with_the_deploy
+            }
+
+            # The health checks that start while the last deploy step still runs: no execution group after the deploy step's,
+            # up to and including the health check's, waits for the steps before it (StartAfterPrevious).
+            starts_with_the_deploy contains i if {
+            	some i in health_checks
+            	some group_a, execution_a in input.Execution
+            	input.Steps[last_deploy].Id in execution_a.Steps
+            	some group_b, execution_b in input.Execution
+            	input.Steps[i].Id in execution_b.Steps
+            	group_a < group_b
+            	waits := [g |
+            		some g, execution in input.Execution
+            		g > group_a
+            		g <= group_b
+            		execution.StartTrigger == "StartAfterPrevious"
+            	]
+            	count(waits) == 0
+            }
+
+            health_check_steps := [step |
+            	some step in input.Steps
+            	step.Id in health_check_ids
+            ]
+
+            deploy := input.Steps[last_deploy].Slug
+
+            violation_reason := sprintf("Step %s deploys the application with no health check after it: add the step verify-deployable after it.", [deploy]) if {
+            	count(health_check_steps) == 0
+            }
+
+            violation_reason := sprintf("Step %s deploys the application, but its health check does not run: %s.", [deploy, concat("; ", not_running)]) if {
+            	count(health_check_steps) > 0
+            	count(health_checks) == 0
+            }
+
+            violation_reason := sprintf("The health check (%s) does not run after step %s has finished.", [concat(", ", [input.Steps[i].Slug | some i in health_checks]), deploy]) if {
+            	count(health_check_steps) > 0
+            	count(health_checks) > 0
+            }
+
+            # Why each health check does not run: disabled, or else skipped in this deployment.
+            disabled_ids contains step.Id if {
+            	some step in health_check_steps
+            	not step.Enabled
+            }
+
+            state_word := {true: "disabled", false: "skipped"}
+
+            not_running := [reason |
+            	some step in health_check_steps
+            	disabled := step.Id in disabled_ids
+            	reason := sprintf("step %s is %s", [step.Slug, state_word[disabled]])
+            ]
+            EOT
+}
+
+scope {
+    rego = <<-EOT
+            package app_deployment_has_health_check
+
+            # Deployments to every environment in the spaces of the kit's demo systems (the kit names each space
+            # "<slug> demo", so its slug ends in -demo). Runbook runs are out of scope. The bootcamp's space is not in scope:
+            # its process has no health check step, and its owners decide whether to add one.
+            default evaluate := false
+
+            evaluate if {
+            	not input.Runbook
+            	endswith(input.Space.Slug, "-demo")
+            }
+            EOT
+}
