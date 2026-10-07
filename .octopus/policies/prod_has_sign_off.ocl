@@ -1,7 +1,7 @@
 name = "Deploy - Production has a sign-off"
-description = "Every production deployment of the demo systems (spaces whose slug ends in -demo) and of the bootcamp (space churchbulletin) runs a sign-off: an enabled, not skipped manual intervention (Octopus.Manual) or a step of the process template kit-sign-off. Warn mode first (decision D5). Exempt: the bootcamp, which has no Octopus approval by design."
+description = "Every production deployment of the demo systems (spaces whose slug ends in -demo) and of the bootcamp (space churchbulletin) runs a sign-off: an enabled, not skipped manual intervention (Octopus.Manual) or a step of the process template cmdemo-process-template. Warn mode first (decision D5). Exempt: the bootcamp, which has no Octopus approval by design."
 violation_action = "warn"
-violation_reason = "A production deployment needs a sign-off that runs: an enabled manual intervention (Octopus.Manual) or the kit-sign-off process template, not skipped."
+violation_reason = "A production deployment needs a sign-off that runs: an enabled manual intervention (Octopus.Manual) or the cmdemo-process-template process template, not skipped."
 
 conditions {
     rego = <<-EOT
@@ -32,7 +32,7 @@ conditions {
             	not exemptions[input.Space.Slug]
             }
 
-            # A sign-off: a manual intervention, or a step of the process template kit-sign-off.
+            # A sign-off: a manual intervention, or a step of the process template cmdemo-process-template.
             sign_off_ids contains step.Id if {
             	some step in input.Steps
             	step.ActionType == "Octopus.Manual"
@@ -41,7 +41,7 @@ conditions {
             sign_off_ids contains step.Id if {
             	some step in input.Steps
             	step.Source.Type == "Process Template"
-            	step.Source.SlugOrId == "kit-sign-off"
+            	step.Source.SlugOrId == "cmdemo-process-template"
             }
 
             # The sign-offs in the order of the process.
@@ -59,7 +59,7 @@ conditions {
 
             has_running_sign_off if count(running_sign_offs) > 0
 
-            violation_reason := "No sign-off in this production deployment: add an enabled manual intervention (Octopus.Manual) or the kit-sign-off process template." if {
+            violation_reason := "No sign-off in this production deployment: add an enabled manual intervention (Octopus.Manual) or the cmdemo-process-template process template." if {
             	count(sign_off_steps) == 0
             }
 

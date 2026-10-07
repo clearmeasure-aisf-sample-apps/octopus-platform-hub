@@ -39,8 +39,8 @@ test_a_manual_intervention_is_a_sign_off if {
 	policy.result == {"allowed": true} with input as policy_input.deployment("cmdemo1-demo", "prod", [sign_off, update], [])
 }
 
-test_a_step_of_the_kit_sign_off_template_is_a_sign_off if {
-	templated := policy_input.from_template(policy_input.step("template-id", "sign-off", "Octopus.Script"), "kit-sign-off")
+test_a_step_of_the_sign_off_template_is_a_sign_off if {
+	templated := policy_input.from_template(policy_input.step("template-id", "sign-off", "Octopus.Script"), "cmdemo-process-template")
 	policy.result == {"allowed": true} with input as policy_input.deployment("cmdemo2-demo", "prod", [templated, update], [])
 }
 
@@ -57,7 +57,7 @@ test_no_sign_off_violates if {
 	result == {
 		"allowed": false,
 		"action": "warn",
-		"reason": "No sign-off in this production deployment: add an enabled manual intervention (Octopus.Manual) or the kit-sign-off process template.",
+		"reason": "No sign-off in this production deployment: add an enabled manual intervention (Octopus.Manual) or the cmdemo-process-template process template.",
 	}
 }
 

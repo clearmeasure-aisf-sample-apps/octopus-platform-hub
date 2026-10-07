@@ -27,14 +27,14 @@ only source of the instance's process templates and policies (decision D2 of the
   kit's fleet reads the process with its scopes and reports that case (`policy/<slug>/<project>/sign-off` and
   `.../restore-point` of `test-fleet.ps1`); the policies here catch what the fleet cannot see, a step disabled or
   skipped in one deployment. Both stay.
-- **Not done:** the process template `kit-sign-off` is still a draft and shared with no space;
+- **Not done:** the process template `cmdemo-process-template` is still a draft and shared with no space;
   [How it gets connected](#how-it-gets-connected) keeps the remaining steps.
 
 ## What it serves
 
 | System | Space | Policies | Templates |
 |---|---|---|---|
-| cmdemo1 | `cmdemo1 demo` (Spaces-355, slug `cmdemo1-demo`) | both | `kit-sign-off` once the kit uses it (plan phase 4) |
+| cmdemo1 | `cmdemo1 demo` (Spaces-355, slug `cmdemo1-demo`) | both | `cmdemo-process-template` once the kit uses it (plan phase 4) |
 | cmdemo2 | `cmdemo2 demo` (Spaces-356, slug `cmdemo2-demo`) | both | the same |
 | cmdemo3 | `cmdemo3 demo` (Spaces-357, slug `cmdemo3-demo`) | both | the same |
 | bootcamp | `ChurchBulletin` (Spaces-315, slug `churchbulletin`), project `ChurchBulletin-gh` | both; exempt from the sign-off | only if its owners adopt them (D6) |
@@ -51,7 +51,7 @@ instance is in their scope.
     prod_has_sign_off.ocl                policy, warn mode
     prod_db_change_has_restore_point.ocl policy, warn mode
   process-templates/
-    kit-sign-off.ocl                     process template, DRAFT
+    cmdemo-process-template.ocl          process template, DRAFT
 fixtures/                                the policy input of real deployments, and manifest.json
 schema/policy-input.schema.json          the documented policy input schema, verbatim
 scripts/                                 test.ps1, preview.ps1, build-fixtures.ps1; policies.ps1 is their library
@@ -90,7 +90,7 @@ policy version.
 
 | Policy | Rule | Exemption, with its reason (D5, 2026-10-05) |
 |---|---|---|
-| [`prod_has_sign_off`](.octopus/policies/prod_has_sign_off.ocl) "Deploy - Production has a sign-off" | A production deployment has a sign-off that runs: an enabled, not skipped step of type `Octopus.Manual`, or a step of the process template `kit-sign-off` | `churchbulletin`: the bootcamp has no Octopus approval by design; its master builds reach Prod after the TDD acceptance tests and the GitHub environment wait timers |
+| [`prod_has_sign_off`](.octopus/policies/prod_has_sign_off.ocl) "Deploy - Production has a sign-off" | A production deployment has a sign-off that runs: an enabled, not skipped step of type `Octopus.Manual`, or a step of the process template `cmdemo-process-template` | `churchbulletin`: the bootcamp has no Octopus approval by design; its master builds reach Prod after the TDD acceptance tests and the GitHub environment wait timers |
 | [`prod_db_change_has_restore_point`](.octopus/policies/prod_db_change_has_restore_point.ocl) "Deploy - Production database change has a restore point" | A production deployment whose process changes a database schema (step `migrate-database`, the bootcamp's `run-db-migrations`, or a step of the template `kit-migrate-database`) records a restore point first (step `record-restore-point`, or the template `kit-record-restore-point`), finished before the first change | `cmdemo3-demo`: cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore |
 
 - **Scope** (both): deployments, not runbook runs (`not input.Runbook`), to the environment `prod`, in a space whose
@@ -111,7 +111,7 @@ policy version.
 
 ## Process templates
 
-[`kit-sign-off`](.octopus/process-templates/kit-sign-off.ocl), "Kit - Sign-off": **DRAFT**, not published and used by
+[`cmdemo-process-template`](.octopus/process-templates/cmdemo-process-template.ocl), "cmdemo-process-template": **DRAFT**, not published and used by
 no project. It is the first template of plan section 5.2, for plan phase 4, and has to pass the spike of phase 2
 first.
 
@@ -140,8 +140,8 @@ first.
     type                  = "Octopus.ProcessTemplate"
     excluded_environments = [octopusdeploy_environment.this[local.first_environment].id]
     execution_properties = {
-      "Octopus.Action.ProcessTemplate.Reference.Slug"        = "kit-sign-off"
-      "Octopus.Action.ProcessTemplate.Reference.VersionMask" = local.system.octopus.templates["kit-sign-off"]
+      "Octopus.Action.ProcessTemplate.Reference.Slug"        = "cmdemo-process-template"
+      "Octopus.Action.ProcessTemplate.Reference.VersionMask" = local.system.octopus.templates["cmdemo-process-template"]
       "Template.SignOff.Teams"                               = local.sign_off_team_id
     }
   }
@@ -228,7 +228,7 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    `scripts/test.ps1` now checks. Not done: the replay in the Evaluations tab against earlier runs (the API has no
    endpoint for it). Next: watch the promotions to prod of the demo systems (3.3); a deployment that complies logs
    "Compliant with policy ..." under "Apply compliance policies".
-5. **Templates (phase 4).** After the spike: publish `kit-sign-off` 1.0.0 as a pre-release, share it with the canary
+5. **Templates (phase 4).** After the spike: publish `cmdemo-process-template` 1.0.0 as a pre-release, share it with the canary
    space only, and remove its DRAFT mark here.
 
 ## Open questions for the licence day, with the answers of 2026-10-07
@@ -251,5 +251,5 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    **Answer:** not known by name, but it refuses user-defined functions at publish. Values, sets, arrays, comprehensions, `some ... in`, `not`, `count`, `min`, `sprintf` and `concat` are accepted and evaluate as opa does.
 6. How the task log and audit log show an allowed result that carries a `reason` (exempt, no database change).
    **Answer:** an allowed result with a reason logs "Compliant with policy \"...\" (<reason>)" at Info level: no warning. A violation in warn mode logs a Warning with the reason, and the task ends Success with warnings.
-7. Whether Octopus accepts the Git-authored `kit-sign-off.ocl` as it is (name, icon, Teams parameter), and the spike
+7. Whether Octopus accepts the Git-authored `cmdemo-process-template.ocl` as it is (name, icon, Teams parameter), and the spike
    items 2 (an exact version as mask) and 5 (its manual intervention answered through `/interruptions`).
