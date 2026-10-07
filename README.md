@@ -10,8 +10,10 @@ only source of the instance's process templates and policies (decision D2 of the
   protected and **no credentials**: the repository is public, so Octopus only reads. Nothing can be saved from the
   Octopus UI; a policy or a template changes here, by pull request. That is the decision (Jeffrey, 2026-10-07):
   no edits from the Octopus UI, so no Platform Hub GitHub App connection is made.
-- **Policies.** `prod_has_sign_off` and `prod_db_change_has_restore_point` are published as 1.0.0 (commit `34d1224`)
-  and active. Both warn and block nothing.
+- **Policies.** Three are published and active; all warn and block nothing:
+  `prod_has_sign_off` 1.1.0 (1.0.0 until the process template was renamed), `prod_db_change_has_restore_point` 1.0.0,
+  and `app_deployment_has_health_check` 1.0.0 (2026-10-07: every application deployment, to any environment, asks
+  the app's health endpoint after the update).
 - **Seen at work** in a throwaway space (`cmprobe demo`, deleted afterwards), four prod deployments:
 
   | Process | Sign-off policy | Restore-point policy | Task |
@@ -21,11 +23,15 @@ only source of the instance's process templates and policies (decision D2 of the
   | Migrate database only | warning with the policy's reason | warning with the policy's reason | Success with warnings; the deployment went on |
   | Sign-off and Record restore point scoped to uat only, Migrate database | compliant | compliant | Success, no warning: **see the limit below** |
 
+- **The health check policy seen at work** in the same kind of throwaway space, three deployments to tdd: Update
+  deployable then Verify deployable, compliant and no warning; Update deployable alone, a warning with the reason
+  and the deployment went on; Apply environment and Verify environment, compliant ("No application is deployed in
+  this deployment.").
 - **The limit Octopus has.** `input.Steps` lists every step of the process, also a step whose environment scope
   leaves this deployment out; such a step has `Enabled: true` and `IsConditional: true`, exactly like a step scoped to
   include it. A policy cannot tell a sign-off that runs in prod from one scoped away from it. The demo-environment
-  kit's fleet reads the process with its scopes and reports that case (`policy/<slug>/<project>/sign-off` and
-  `.../restore-point` of `test-fleet.ps1`); the policies here catch what the fleet cannot see, a step disabled or
+  kit's fleet reads the process with its scopes and reports that case (`policy/<slug>/<project>/sign-off`,
+  `.../restore-point` and `.../health-check` of `test-fleet.ps1`); the policies here catch what the fleet cannot see, a step disabled or
   skipped in one deployment. Both stay.
 - **Not done:** the process template `cmdemo-process-template` is still a draft and shared with no space;
   [How it gets connected](#how-it-gets-connected) keeps the remaining steps.
