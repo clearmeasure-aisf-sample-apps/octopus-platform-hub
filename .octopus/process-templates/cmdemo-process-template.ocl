@@ -1,4 +1,4 @@
-name = "Kit - Sign-off"
+name = "cmdemo-process-template"
 description = <<-EOT
         The sign-off of the demo-environment kit's systems: a manual intervention that the responsible team answers before a release reaches an environment. People answer it in the Octopus UI; automation answers it as ai-ops with a recorded reason (invoke-demo-promotion.ps1 -Approve -Reason), which still counts as a sign-off.
         <br /><br />
