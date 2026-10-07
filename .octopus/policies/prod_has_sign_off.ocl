@@ -7,6 +7,9 @@ conditions {
     rego = <<-EOT
             package prod_has_sign_off
 
+            # Octopus accepts no user-defined functions in a policy ("User-defined functions are not supported", at the first
+            # publish on 2026-10-07): every rule here is a value, a set or an array, and each result has a body of its own.
+
             # Warn first everywhere (decision D5). The -demo spaces move to block after two clean weeks (plan phase 7).
             violation_action := "warn"
 
@@ -16,36 +19,67 @@ conditions {
             default result := {"allowed": false, "action": "warn", "reason": "A production deployment needs a sign-off that runs."}
 
             result := {"allowed": true} if {
-            	count(running_sign_offs) > 0
-            } else := {"allowed": true, "reason": concat("", ["Exempt: ", exemptions[input.Space.Slug]])} if {
+            	has_running_sign_off
+            }
+
+            result := {"allowed": true, "reason": concat("", ["Exempt: ", exemptions[input.Space.Slug]])} if {
+            	not has_running_sign_off
             	exemptions[input.Space.Slug]
-            } else := {"allowed": false, "action": violation_action, "reason": violation_reason}
+            }
+
+            result := {"allowed": false, "action": violation_action, "reason": violation_reason} if {
+            	not has_running_sign_off
+            	not exemptions[input.Space.Slug]
+            }
 
             # A sign-off: a manual intervention, or a step of the process template kit-sign-off.
-            sign_off(step) if step.ActionType == "Octopus.Manual"
+            sign_off_ids contains step.Id if {
+            	some step in input.Steps
+            	step.ActionType == "Octopus.Manual"
+            }
 
-            sign_off(step) if {
+            sign_off_ids contains step.Id if {
+            	some step in input.Steps
             	step.Source.Type == "Process Template"
             	step.Source.SlugOrId == "kit-sign-off"
             }
 
+            # The sign-offs in the order of the process.
+            sign_off_steps := [step |
+            	some step in input.Steps
+            	step.Id in sign_off_ids
+            ]
+
             # A step runs in this deployment when it is enabled and not skipped.
-            runs(step) if {
+            running_sign_offs := [step.Slug |
+            	some step in sign_off_steps
             	step.Enabled
             	not step.Id in input.SkippedSteps
-            }
+            ]
 
-            sign_off_steps := [step | some step in input.Steps; sign_off(step)]
-
-            running_sign_offs := [step.Slug | some step in sign_off_steps; runs(step)]
+            has_running_sign_off if count(running_sign_offs) > 0
 
             violation_reason := "No sign-off in this production deployment: add an enabled manual intervention (Octopus.Manual) or the kit-sign-off process template." if {
             	count(sign_off_steps) == 0
-            } else := sprintf("The sign-off of this production deployment does not run: %s.", [concat("; ", [not_running(step) | some step in sign_off_steps])])
+            }
 
-            not_running(step) := sprintf("step %s is disabled", [step.Slug]) if {
+            violation_reason := sprintf("The sign-off of this production deployment does not run: %s.", [concat("; ", not_running)]) if {
+            	count(sign_off_steps) > 0
+            }
+
+            # Why each sign-off does not run: disabled, or else skipped in this deployment.
+            disabled_ids contains step.Id if {
+            	some step in sign_off_steps
             	not step.Enabled
-            } else := sprintf("step %s is skipped", [step.Slug])
+            }
+
+            state_word := {true: "disabled", false: "skipped"}
+
+            not_running := [reason |
+            	some step in sign_off_steps
+            	disabled := step.Id in disabled_ids
+            	reason := sprintf("step %s is %s", [step.Slug, state_word[disabled]])
+            ]
             EOT
 }
 
