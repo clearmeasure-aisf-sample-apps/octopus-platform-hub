@@ -50,7 +50,7 @@
         {
           "Id": "1ca6a900-9c71-4075-8817-8fe71d624354",
           "Name": "cmfleet-dashboard",
-          "Version": "1.0.25",
+          "Version": "1.0.27",
           "Feed": {
             "Id": "Feeds-1875",
             "Name": "Octopus Server (built-in)",
@@ -76,7 +76,7 @@
         {
           "Id": "1312fe9e-258e-434b-8cc7-e3e57924fd48",
           "Name": "cmfleet-dashboard",
-          "Version": "1.0.25",
+          "Version": "1.0.27",
           "Feed": {
             "Id": "Feeds-1875",
             "Name": "Octopus Server (built-in)",
@@ -102,7 +102,7 @@
         {
           "Id": "28f87b94-c93a-47c2-97ec-120899b9f702",
           "Name": "cmfleet-dashboard",
-          "Version": "1.0.25",
+          "Version": "1.0.27",
           "Feed": {
             "Id": "Feeds-1875",
             "Name": "Octopus Server (built-in)",
@@ -147,10 +147,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T08:46:23.283Z",
+  "CreatedAt": "2026-10-08T17:24:55.038Z",
   "Release": {
-    "Id": "Releases-50132",
-    "Name": "1.0.25",
-    "Version": "1.0.25"
+    "Id": "Releases-50164",
+    "Name": "1.0.27",
+    "Version": "1.0.27"
   }
 }

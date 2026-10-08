@@ -63,7 +63,7 @@
         {
           "Id": "eb6a931c-8c13-4ff8-9bd0-0a5bc6b92607",
           "Name": "jpcom-web",
-          "Version": "1.0.58",
+          "Version": "1.0.60",
           "Feed": {
             "Id": "Feeds-1867",
             "Name": "Octopus Server (built-in)",
@@ -89,7 +89,7 @@
         {
           "Id": "ae386881-d019-45cb-9f5c-07e734d925c5",
           "Name": "jpcom-web",
-          "Version": "1.0.58",
+          "Version": "1.0.60",
           "Feed": {
             "Id": "Feeds-1867",
             "Name": "Octopus Server (built-in)",
@@ -128,7 +128,7 @@
         {
           "Id": "3f6bef02-b2d2-4849-8d55-4fc4435aa535",
           "Name": "jpcom-web",
-          "Version": "1.0.58",
+          "Version": "1.0.60",
           "Feed": {
             "Id": "Feeds-1867",
             "Name": "Octopus Server (built-in)",
@@ -154,7 +154,7 @@
         {
           "Id": "5822fb17-c099-4f15-b663-6a94f17f4e82",
           "Name": "jpcom-web",
-          "Version": "1.0.58",
+          "Version": "1.0.60",
           "Feed": {
             "Id": "Feeds-1867",
             "Name": "Octopus Server (built-in)",
@@ -255,10 +255,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T15:59:48.856Z",
+  "CreatedAt": "2026-10-08T17:44:33.340Z",
   "Release": {
-    "Id": "Releases-50157",
-    "Name": "1.0.58",
-    "Version": "1.0.58"
+    "Id": "Releases-50163",
+    "Name": "1.0.60",
+    "Version": "1.0.60"
   }
 }

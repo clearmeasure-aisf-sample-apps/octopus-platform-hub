@@ -63,7 +63,7 @@
         {
           "Id": "b7f7b039-32e4-4fa0-b1d6-4aaa9089864d",
           "Name": "ChurchBulletin.Database",
-          "Version": "2.4.22",
+          "Version": "2.4.23",
           "Feed": {
             "Id": "Feeds-1855",
             "Name": "Octopus Server (built-in)",
@@ -102,7 +102,7 @@
         {
           "Id": "26e27f56-93ba-4cf4-b5a1-89fc60e2ad2e",
           "Name": "ChurchBulletin.AcceptanceTests",
-          "Version": "2.4.22",
+          "Version": "2.4.23",
           "Feed": {
             "Id": "Feeds-1855",
             "Name": "Octopus Server (built-in)",
@@ -128,7 +128,7 @@
         {
           "Id": "b8931fc7-933b-4895-b051-02b1e8f39949",
           "Name": "cmdemo3/ui",
-          "Version": "2.4.22",
+          "Version": "2.4.23",
           "Feed": {
             "Id": "Feeds-1859",
             "Name": "acr-cmdemo3",
@@ -180,6 +180,19 @@
       "Packages": []
     },
     {
+      "Id": "f414f7dc-416b-4ac5-99ec-889b812114f3",
+      "Slug": "verify-revert",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
       "Id": "a2a726b5-756e-4126-becb-7cedfeed5196",
       "Slug": "open-test-database",
       "ActionType": "Octopus.Script",
@@ -207,7 +220,7 @@
         {
           "Id": "9aaac7d3-3ab0-4b9d-b073-a1f0b1542603",
           "Name": "ChurchBulletin.AcceptanceTests",
-          "Version": "2.4.22",
+          "Version": "2.4.23",
           "Feed": {
             "Id": "Feeds-1855",
             "Name": "Octopus Server (built-in)",
@@ -278,6 +291,12 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
+        "f414f7dc-416b-4ac5-99ec-889b812114f3"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
         "a2a726b5-756e-4126-becb-7cedfeed5196"
       ]
     },
@@ -294,10 +313,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-06T17:53:25.076Z",
+  "CreatedAt": "2026-10-08T18:41:18.883Z",
   "Release": {
-    "Id": "Releases-49974",
-    "Name": "2.4.22",
-    "Version": "2.4.22"
+    "Id": "Releases-50170",
+    "Name": "2.4.23",
+    "Version": "2.4.23"
   }
 }
