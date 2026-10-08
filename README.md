@@ -4,25 +4,24 @@ The [Platform Hub](https://octopus.com/docs/platform-hub) repository of the Octo
 https://clearmeasure.octopus.app. Platform Hub reads one Git repository for the whole instance; this repository is the
 only source of the instance's process templates and policies (decision D2 of the Platform Hub plan).
 
-**Status: connected since 2026-10-07; three policies active in warn mode. Written here and not published yet
-(2026-10-08): the scope with the spaces `cmfleet` and `jeffreypalermo-sites`, and the fourth policy
-`rollback_has_health_check`.**
+**Status: connected since 2026-10-07; four policies active in warn mode since 2026-10-08, in the spaces whose slug
+ends in `-demo` and in `cmfleet` and `jeffreypalermo-sites`.**
 
 - **Version control.** Platform Hub reads this repository at `main`, base path `.octopus`, with the default branch
   protected and **no credentials**: the repository is public, so Octopus only reads. Nothing can be saved from the
   Octopus UI; a policy or a template changes here, by pull request. That is the decision (Jeffrey, 2026-10-07):
   no edits from the Octopus UI, so no Platform Hub GitHub App connection is made.
-- **Policies.** Three are published and active; all warn and block nothing:
-  `prod_has_sign_off` 1.1.0 (1.0.0 until the process template was renamed), `prod_db_change_has_restore_point` 1.0.0,
-  and `app_deployment_has_health_check` 1.0.0 (2026-10-07: every application deployment, to any environment, asks
-  the app's health endpoint after the update). Each of the three is published with the scope it had then: the
-  spaces whose slug ends in `-demo`, and `churchbulletin` for the first two.
-- **To publish** (2026-10-08, the operator, once this is on `main`): the scope of all three now names the spaces
-  `cmfleet` and `jeffreypalermo-sites` too, and a policy whose scope changed needs a new version, so
-  `prod_has_sign_off` **1.2.0**, `prod_db_change_has_restore_point` **1.1.0** and
-  `app_deployment_has_health_check` **1.1.0**; and the new policy `rollback_has_health_check` **1.0.0**. Each is
-  then activated, as 1.1.0 of the sign-off was. Until then Octopus evaluates nothing in those two spaces and no
-  rollback anywhere.
+- **Policies.** Four are published and active; all warn and block nothing: `prod_has_sign_off` **1.2.0**,
+  `prod_db_change_has_restore_point` **1.1.0**, `app_deployment_has_health_check` **1.1.0** and
+  `rollback_has_health_check` **1.0.0**, all published from commit d602f0b on 2026-10-08 by the operator through the
+  API and activated then. The earlier versions (sign-off 1.1.0 and 1.0.0, the other two 1.0.0) are published and no
+  longer active; their scope was the `-demo` spaces, and `churchbulletin` for the first two. Octopus accepted
+  `startswith`, which the new policy is the first to call.
+- **Seen at work in a fleet space** (2026-10-08, `cmfleet`, ServerTasks-11997784, cmfleet-dashboard 1.0.27 to prod):
+  under "Apply compliance policies" the task logs, at Info level and with no warning, "Compliant with policy" for
+  all four: the health check, the restore point ("No database change runs in this deployment."), the sign-off, and
+  the rollback ("No rollback step runs in this deployment."). No deployment of `jeffreypalermo-sites` has been read
+  since; its preview rows are all allowed.
 - **An exemption to remove.** `rollback_has_health_check` 1.0.0 exempts the space `cmdemo3-demo`. A release carries
   the process it was made with, and the latest releases of cmdemo3's two cluster projects (`cmdemo3-ui` 2.4.22,
   `cmdemo3-dashboard` 1.0.13) were made before their processes got the step Verify revert after Revert pin (the
@@ -279,10 +278,10 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    `scripts/test.ps1` now checks. Not done: the replay in the Evaluations tab against earlier runs (the API has no
    endpoint for it). Next: watch the promotions to prod of the demo systems (3.3); a deployment that complies logs
    "Compliant with policy ..." under "Apply compliance policies".
-   **Next, not done** (2026-10-08): publish and activate the four versions the status above names
-   (`prod_has_sign_off` 1.2.0, `prod_db_change_has_restore_point` 1.1.0, `app_deployment_has_health_check` 1.1.0,
-   `rollback_has_health_check` 1.0.0). The new policy's Rego calls `startswith`, which no published policy has
-   used yet: the publish is where Octopus accepts or refuses it.
+   Done on 2026-10-08 for the four versions the status above names (`prod_has_sign_off` 1.2.0,
+   `prod_db_change_has_restore_point` 1.1.0, `app_deployment_has_health_check` 1.1.0, `rollback_has_health_check`
+   1.0.0): the same two calls for each, with `GitRef` `refs/heads/main`; activating a version takes the earlier one
+   out of use. The new policy's Rego calls `startswith`, and Octopus accepted it.
 5. **Templates (phase 4).** After the spike: publish `cmdemo-process-template` 1.0.0 as a pre-release, share it with the canary
    space only, and remove its DRAFT mark here.
 
