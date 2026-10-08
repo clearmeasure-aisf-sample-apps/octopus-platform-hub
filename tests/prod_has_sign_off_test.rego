@@ -17,16 +17,25 @@ test_prod_in_the_bootcamp_space_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("churchbulletin", "prod", [update], [])
 }
 
+test_prod_in_the_two_named_spaces_of_the_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("cmfleet", "prod", [sign_off, update], [])
+	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, update], [])
+}
+
 test_other_environments_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo", "tdd", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo", "uat", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "uat", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("cmfleet", "tdd", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo-sites", "uat", [update], [])
 }
 
 test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("default", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("devops-bootcamp", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo-archive", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [update], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
@@ -87,6 +96,13 @@ test_a_step_of_another_template_is_not_a_sign_off if {
 }
 
 # Exemptions
+
+test_the_exemption_does_not_cover_the_named_spaces if {
+	cmfleet := policy.result with input as policy_input.deployment("cmfleet", "prod", [update], [])
+	cmfleet.allowed == false
+	jpcom := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", [update], [])
+	jpcom.allowed == false
+}
 
 test_the_bootcamp_is_exempt if {
 	result := policy.result with input as policy_input.deployment("churchbulletin", "prod", [update], [])

@@ -31,9 +31,10 @@
 param(
     # The demo-environment kit's library (Read-DemoConfig, Invoke-OctopusApi) and a demo file that names the instance.
     [string] $DemoCommon = (Join-Path $HOME 'demo-environment-kit' '.claude' 'skills' 'demo-environment' 'scripts' 'demo-common.ps1'),
-    [string] $DemoFile = (Join-Path $HOME 'demos' 'cmdemo1.json'),
-    # The spaces: cmdemo1 demo, cmdemo2 demo, cmdemo3 demo, and the bootcamp's ChurchBulletin.
-    [string[]] $SpaceId = @('Spaces-355', 'Spaces-356', 'Spaces-357', 'Spaces-315'),
+    [string] $DemoFile = (Join-Path $HOME 'demo-environment-kit' 'fleet' 'systems' 'cmdemo1.json'),
+    # The spaces: cmdemo1 demo, cmdemo2 demo, cmdemo3 demo, the fleet's two systems whose space has another name
+    # (cmfleet; "JeffreyPalermo - Sites" of jpcom), and the bootcamp's ChurchBulletin.
+    [string[]] $SpaceId = @('Spaces-355', 'Spaces-356', 'Spaces-357', 'Spaces-378', 'Spaces-375', 'Spaces-315'),
     [string] $Environment = 'prod',
     # Out-of-scope cases, each <space id>/<project slug>/<environment slug>: the latest deployment there.
     [string[]] $OutOfScope = @('Spaces-355/cmdemo1-ui/tdd'),
@@ -221,6 +222,7 @@ function Get-SystemName {
     param($Space)
     if ($Space.Slug -like '*-demo') { return $Space.Slug.Substring(0, $Space.Slug.Length - '-demo'.Length) }
     if ($Space.Slug -eq 'churchbulletin') { return 'bootcamp' }
+    if ($Space.Slug -eq 'jeffreypalermo-sites') { return 'jpcom' }
     return $Space.Slug
 }
 

@@ -23,6 +23,13 @@ test_every_environment_of_a_demo_space_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("cmdemo3-demo", "prod", [update, verify], [])
 }
 
+test_every_environment_of_the_two_named_spaces_of_the_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("cmfleet", "tdd", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("cmfleet", "prod", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "uat", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", [update, verify], [])
+}
+
 test_the_bootcamp_space_is_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "prod", [update], [])
 }
@@ -30,10 +37,13 @@ test_the_bootcamp_space_is_out_of_scope if {
 test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("default", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo-archive", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [update], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.runbook_run("cmdemo1-demo", "prod", [update])
+	policy.evaluate == false with input as policy_input.runbook_run("cmfleet", "prod", [update])
 }
 
 # Allowed
@@ -54,6 +64,21 @@ test_a_deployment_that_updates_no_application_complies if {
 test_a_skipped_update_is_no_deployment if {
 	result := policy.result with input as policy_input.deployment("cmdemo1-demo", "prod", [pin, update], ["update-id"])
 	result == {"allowed": true, "reason": "No application is deployed in this deployment."}
+}
+
+# The processes of the two named spaces, as they were on 2026-10-08.
+test_the_processes_of_the_named_spaces_comply if {
+	sign_off := policy_input.step("sign-off-id", "sign-off", "Octopus.Manual")
+	cmfleet_dashboard := [sign_off, update, verify, policy_input.step("run-tests-id", "run-acceptance-tests", "Octopus.Script")]
+	policy.result == {"allowed": true} with input as policy_input.deployment("cmfleet", "prod", cmfleet_dashboard, [])
+	jpcom_system := [sign_off, apply, verify_environment]
+	system := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", jpcom_system, [])
+	system == {"allowed": true, "reason": "No application is deployed in this deployment."}
+}
+
+test_no_health_check_in_a_named_space_violates if {
+	result := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "tdd", [pin, update], [])
+	result.allowed == false
 }
 
 # Violations
