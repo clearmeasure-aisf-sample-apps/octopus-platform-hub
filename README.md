@@ -17,19 +17,17 @@ ends in `-demo` and in `cmfleet` and `jeffreypalermo-sites`.**
   API and activated then. The earlier versions (sign-off 1.1.0 and 1.0.0, the other two 1.0.0) are published and no
   longer active; their scope was the `-demo` spaces, and `churchbulletin` for the first two. Octopus accepted
   `startswith`, which the new policy is the first to call.
+- **To publish** (2026-10-08, the operator, once this is on `main`): `rollback_has_health_check` **1.1.0**, the
+  policy without its exemption, then activated. Until then 1.0.0, with the exemption, is the active version.
 - **Seen at work in a fleet space** (2026-10-08, `cmfleet`, ServerTasks-11997784, cmfleet-dashboard 1.0.27 to prod):
   under "Apply compliance policies" the task logs, at Info level and with no warning, "Compliant with policy" for
   all four: the health check, the restore point ("No database change runs in this deployment."), the sign-off, and
   the rollback ("No rollback step runs in this deployment."). No deployment of `jeffreypalermo-sites` has been read
   since; its preview rows are all allowed.
-- **An exemption to remove.** `rollback_has_health_check` 1.0.0 exempts the space `cmdemo3-demo`. A release carries
-  the process it was made with, and the latest releases of cmdemo3's two cluster projects (`cmdemo3-ui` 2.4.22,
-  `cmdemo3-dashboard` 1.0.13) were made before their processes got the step Verify revert after Revert pin (the
-  kit's commit 8ebb204, 2026-10-08). cmdemo3 sleeps, and its next deployments may be of those releases: a warning
-  in a task log is a finding of the fleet, and fails cmdemo3's own check of its deployment logs. The exemption is
-  removed in a later version of the policy, by the session Platform Hub, once `cmdemo3-ui` and `cmdemo3-dashboard`
-  have each deployed to prod a release made after that commit. While it stands, any failure of the rule in that
-  space is allowed with the reason "Exempt: ...", also a Verify revert that is skipped in one deployment.
+- **The exemption that ended.** `rollback_has_health_check` 1.0.0 exempts the space `cmdemo3-demo`, whose releases
+  made before the kit's commit 8ebb204 carried a process with no health check after Revert pin; both of its cluster
+  projects have since deployed to prod a release that has the step Verify revert (`cmdemo3-dashboard` 1.0.15 and
+  `cmdemo3-ui` 2.4.23, 2026-10-08), so 1.1.0 exempts no space.
 - **Seen at work** in a throwaway space (`cmprobe demo`, deleted afterwards), four prod deployments:
 
   | Process | Sign-off policy | Restore-point policy | Task |
@@ -123,7 +121,7 @@ policy version.
 | [`prod_has_sign_off`](.octopus/policies/prod_has_sign_off.ocl) "Deploy - Production has a sign-off" | A production deployment has a sign-off that runs: an enabled, not skipped step of type `Octopus.Manual`, or a step of the process template `cmdemo-process-template` | `churchbulletin`: the bootcamp has no Octopus approval by design; its master builds reach Prod after the TDD acceptance tests and the GitHub environment wait timers |
 | [`prod_db_change_has_restore_point`](.octopus/policies/prod_db_change_has_restore_point.ocl) "Deploy - Production database change has a restore point" | A production deployment whose process changes a database schema (step `migrate-database`, the bootcamp's `run-db-migrations`, or a step of the template `kit-migrate-database`) records a restore point first (step `record-restore-point`, or the template `kit-record-restore-point`), finished before the first change | `cmdemo3-demo`: cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore |
 | [`app_deployment_has_health_check`](.octopus/policies/app_deployment_has_health_check.ocl) "Deploy - Application deployment has a health check" | A deployment that updates an application (step `update-deployable`), to any environment, asks the application's health endpoint afterwards: a step `verify-deployable` that is enabled, not skipped, and starts after the last update step has finished. A deployment that updates no application complies. Warn mode | None. The bootcamp's space is out of scope, not exempt: its process has no health check step, and its owners decide whether it gets one |
-| [`rollback_has_health_check`](.octopus/policies/rollback_has_health_check.ocl) "Deploy - A rollback has a health check" | A deployment, to any environment, in which a rollback step runs asks the application's health after it: a step whose slug starts with `verify-` (the kit's `verify-revert`) that is enabled, not skipped, comes after the last rollback step and starts once that step has finished. A rollback step is `revert-deployable`; `revert-pin` is one too where Argo CD deploys what the pin says, which the policy reads from the step `update-deployable` having an action type that starts with `Octopus.ArgoCD` (runtime aks-argocd, `Octopus.ArgoCDUpdateImageTags`). In every other process `revert-pin` only makes Git say again what runs, and is no rollback. A deployment in which no rollback step runs complies ("No rollback step runs in this deployment."). The fleet's decisions 0018 and 0022 in the demo-environment kit. Warn mode | `cmdemo3-demo`: its releases made before 2026-10-08 carry a process whose `revert-pin` has no health check after it. The process has the step `verify-revert` since the kit's commit 8ebb204, and the exemption goes, in a later version of the policy, when `cmdemo3-ui` and `cmdemo3-dashboard` have each deployed to prod a release made after that. The bootcamp's space is out of scope: its process has no rollback step |
+| [`rollback_has_health_check`](.octopus/policies/rollback_has_health_check.ocl) "Deploy - A rollback has a health check" | A deployment, to any environment, in which a rollback step runs asks the application's health after it: a step whose slug starts with `verify-` (the kit's `verify-revert`) that is enabled, not skipped, comes after the last rollback step and starts once that step has finished. A rollback step is `revert-deployable`; `revert-pin` is one too where Argo CD deploys what the pin says, which the policy reads from the step `update-deployable` having an action type that starts with `Octopus.ArgoCD` (runtime aks-argocd, `Octopus.ArgoCDUpdateImageTags`). In every other process `revert-pin` only makes Git say again what runs, and is no rollback. A deployment in which no rollback step runs complies ("No rollback step runs in this deployment."). The fleet's decisions 0018 and 0022 in the demo-environment kit. Warn mode | None since 1.1.0. `cmdemo3-demo` was exempt in 1.0.0, for its releases made before its process had the step `verify-revert` (the kit's commit 8ebb204); such a release gets the warning if it is deployed again. The bootcamp's space is out of scope: its process has no rollback step |
 
 - **Scope**: deployments, not runbook runs (`not input.Runbook`), in a space whose slug ends in `-demo` or is in the
   set `fleet_spaces` (`cmfleet`, `jeffreypalermo-sites`). The sign-off and the restore point: to the environment
@@ -201,11 +199,11 @@ change data but not the schema (Set employee middle names, Initialize database) 
 (decision 2026-10-05).
 
 Under `rollback_has_health_check`, `jpcom-web` complies (Revert deployable, then Verify revert), and thirteen of
-the sixteen have no rollback step: in the default runtime `revert-pin` is not one. Two fail the rule and are
-exempt, `cmdemo3-ui` 2.4.22 and `cmdemo3-dashboard` 1.0.13: a fixture is the process its deployment ran, and both
-releases were made before those processes got the step Verify revert after Revert pin (the kit's commit 8ebb204,
-2026-10-08). The processes have it now, so the next release of each complies with no exemption; until the
-exemption is removed, a redeployment of those two releases is allowed and logs no warning.
+the sixteen have no rollback step: in the default runtime `revert-pin` is not one. The other two are cmdemo3's
+cluster projects, `cmdemo3-ui` 2.4.23 and `cmdemo3-dashboard` 1.0.15, and they comply: Revert pin, then Verify
+revert. A fixture is the process its deployment ran; their releases before those (2.4.22 and 1.0.13) were made
+before the processes got that step (the kit's commit 8ebb204, 2026-10-08) and were exempt while the policy had its
+exemption. With the fixtures of this day both rows read plain "allowed" before the exemption was taken out.
 
 ## Fixtures
 
@@ -282,6 +280,8 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    `prod_db_change_has_restore_point` 1.1.0, `app_deployment_has_health_check` 1.1.0, `rollback_has_health_check`
    1.0.0): the same two calls for each, with `GitRef` `refs/heads/main`; activating a version takes the earlier one
    out of use. The new policy's Rego calls `startswith`, and Octopus accepted it.
+   **Next, not done** (2026-10-08): publish and activate `rollback_has_health_check` 1.1.0, the policy without the
+   exemption of `cmdemo3-demo`.
 5. **Templates (phase 4).** After the spike: publish `cmdemo-process-template` 1.0.0 as a pre-release, share it with the canary
    space only, and remove its DRAFT mark here.
 

@@ -50,7 +50,7 @@
         {
           "Id": "8327f3fd-0040-4b45-848a-b2ddcc60bc62",
           "Name": "jpcom-system",
-          "Version": "1.0.21",
+          "Version": "1.0.22",
           "Feed": {
             "Id": "Feeds-1867",
             "Name": "Octopus Server (built-in)",
@@ -102,10 +102,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T16:54:24.491Z",
+  "CreatedAt": "2026-10-08T18:40:32.870Z",
   "Release": {
-    "Id": "Releases-50160",
-    "Name": "1.0.21",
-    "Version": "1.0.21"
+    "Id": "Releases-50172",
+    "Name": "1.0.22",
+    "Version": "1.0.22"
   }
 }

@@ -50,7 +50,7 @@
         {
           "Id": "0759ea56-2cea-4aab-acf8-2cd96bf6bd2f",
           "Name": "cmdemo3/dashboard",
-          "Version": "1.0.13",
+          "Version": "1.0.15",
           "Feed": {
             "Id": "Feeds-1859",
             "Name": "acr-cmdemo3",
@@ -113,6 +113,19 @@
         "SlugOrId": ""
       },
       "Packages": []
+    },
+    {
+      "Id": "e48fbcf4-0f25-4140-853d-52d8a3232568",
+      "Slug": "verify-revert",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
     }
   ],
   "SkippedSteps": [],
@@ -152,6 +165,12 @@
       "Steps": [
         "e212332d-b95d-4831-8bc4-489706ccca1d"
       ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "e48fbcf4-0f25-4140-853d-52d8a3232568"
+      ]
     }
   ],
   "RequiresApproval": false,
@@ -160,10 +179,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T02:57:40.259Z",
+  "CreatedAt": "2026-10-08T17:44:55.942Z",
   "Release": {
-    "Id": "Releases-50102",
-    "Name": "1.0.13",
-    "Version": "1.0.13"
+    "Id": "Releases-50166",
+    "Name": "1.0.15",
+    "Version": "1.0.15"
   }
 }
