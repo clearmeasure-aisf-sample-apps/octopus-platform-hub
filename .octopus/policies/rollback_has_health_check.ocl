@@ -1,5 +1,5 @@
 name = "Deploy - A rollback has a health check"
-description = "Every deployment of the demo systems (spaces whose slug ends in -demo) and of the systems cmfleet and jpcom (spaces cmfleet and jeffreypalermo-sites), to any environment, whose process puts the earlier version of an application back in service when an update fails asks the application's health afterwards: a step whose slug starts with verify- that is enabled, not skipped, and starts after the last rollback step has finished. A rollback step is revert-deployable, and revert-pin where Argo CD deploys the pin (the step update-deployable is of an Octopus.ArgoCD type). A deployment in which no rollback step runs complies. The policy input has no run condition, so the policy cannot see whether the health check runs when the deployment has failed; the fleet reads that. Warn mode first (decision D5)."
+description = "Every deployment of the demo systems (spaces whose slug ends in -demo) and of the systems cmfleet and jpcom (spaces cmfleet and jeffreypalermo-sites), to any environment, whose process puts the earlier version of an application back in service when an update fails asks the application's health afterwards: a step whose slug starts with verify- that is enabled, not skipped, and starts after the last rollback step has finished. A rollback step is revert-deployable, and revert-pin where Argo CD deploys the pin (the step update-deployable is of an Octopus.ArgoCD type). A deployment in which no rollback step runs complies. The policy input has no run condition, so the policy cannot see whether the health check runs when the deployment has failed; the fleet reads that. Warn mode first (decision D5). Exempt: cmdemo3 (space cmdemo3-demo), until each of its cluster projects has deployed to prod a release made after its process got the step verify-revert."
 violation_action = "warn"
 violation_reason = "A rollback needs a health check after it."
 
@@ -27,6 +27,12 @@ conditions {
             # A step whose slug starts with this asks an application's health: the kit's "Verify revert" and "Verify deployable".
             health_check_prefix := "verify-"
 
+            # Spaces exempt from this policy, each with its reason (decision 2026-10-08). A release carries the process it was
+            # made with, and a warning in a task log is a finding of the fleet: cmdemo3 sleeps, and its next deployments may be
+            # of releases made before its process had the health check. An exemption applies only where the rule fails, and
+            # then to every failure of the rule in that space: it is removed by a later version of this policy.
+            exemptions := {"cmdemo3-demo": "its releases made before 2026-10-08 carry a process whose step revert-pin has no health check after it; the process has the step verify-revert since the demo-environment kit's commit 8ebb204, and the exemption goes when each of its cluster projects has deployed a release made after that to prod."}
+
             # The policy input has no run condition of a step (IsConditional is also true for an environment scope), so this
             # policy cannot see whether the health check runs when the deployment has failed, which is when a rollback runs. The
             # fleet's rule reads that from the process (policy/<slug>/<project>/rollback-check of test-fleet.ps1).
@@ -42,9 +48,16 @@ conditions {
             	checked
             }
 
+            result := {"allowed": true, "reason": concat("", ["Exempt: ", exemptions[input.Space.Slug]])} if {
+            	count(rollbacks) > 0
+            	not checked
+            	exemptions[input.Space.Slug]
+            }
+
             result := {"allowed": false, "action": violation_action, "reason": violation_reason} if {
             	count(rollbacks) > 0
             	not checked
+            	not exemptions[input.Space.Slug]
             }
 
             argo_cd_deploys if {

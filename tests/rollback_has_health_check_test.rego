@@ -31,8 +31,11 @@ jpcom_dashboard := [sign_off, pin, update, verify, revert_pin]
 
 cmfleet_dashboard := [sign_off, update, verify, policy_input.step("run-tests-id", "run-acceptance-tests", "Octopus.Script")]
 
-# A cluster project of runtime aks-argocd since the kit's commit 8ebb204 (cmdemo3).
+# A cluster project of runtime aks-argocd since the kit's commit 8ebb204 (cmdemo3), and the process its releases
+# made before that carry. cmdemo3 is exempt, so a violation of this runtime is asked of another system, cmdemo4.
 aks := [sign_off, pin, argo_update, verify, revert_pin, verify_revert]
+
+aks_before := [sign_off, pin, argo_update, verify, revert_pin]
 
 # Scope
 
@@ -78,7 +81,7 @@ test_a_health_check_after_the_reverted_pin_complies_where_argo_cd_deploys if {
 test_any_argo_cd_update_makes_the_reverted_pin_a_rollback if {
 	manifests := policy_input.step("update-id", "update-deployable", "Octopus.ArgoCDUpdateManifests")
 	policy.result == {"allowed": true} with input as policy_input.deployment("cmdemo3-demo", "uat", [manifests, revert_pin, verify_revert], [])
-	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "uat", [manifests, revert_pin], [])
+	result := policy.result with input as policy_input.deployment("cmdemo4-demo", "uat", [manifests, revert_pin], [])
 	result.allowed == false
 }
 
@@ -127,8 +130,7 @@ test_the_reverted_pin_after_the_health_check_does_not_matter_where_argo_cd_does_
 # Violations
 
 test_a_reverted_pin_with_nothing_after_it_violates_where_argo_cd_deploys if {
-	steps := [sign_off, pin, argo_update, verify, revert_pin]
-	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "prod", steps, [])
+	result := policy.result with input as policy_input.deployment("cmdemo4-demo", "prod", aks_before, [])
 	result == {
 		"allowed": false,
 		"action": "warn",
@@ -161,7 +163,7 @@ test_a_skipped_health_check_violates if {
 
 test_a_disabled_health_check_violates if {
 	steps := [sign_off, pin, argo_update, verify, revert_pin, policy_input.disabled(verify_revert)]
-	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "prod", steps, [])
+	result := policy.result with input as policy_input.deployment("cmdemo4-demo", "prod", steps, [])
 	result == {
 		"allowed": false,
 		"action": "warn",
@@ -187,7 +189,46 @@ test_a_health_check_that_starts_with_the_rollback_violates if {
 # Where Argo CD deploys, both steps put a version back: the health check follows the last of them.
 test_the_health_check_must_follow_the_last_rollback if {
 	steps := [argo_update, verify, revert, verify_revert, revert_pin]
-	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "prod", steps, [])
+	result := policy.result with input as policy_input.deployment("cmdemo4-demo", "prod", steps, [])
 	result.allowed == false
 	result.reason == "Step revert-pin puts the earlier version back in service with no health check after it: add a step after it whose slug starts with verify- (the kit's verify-revert)."
+}
+
+# Exemptions
+
+test_cmdemo3_is_exempt_where_it_would_violate if {
+	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "prod", aks_before, [])
+	result == {
+		"allowed": true,
+		"reason": "Exempt: its releases made before 2026-10-08 carry a process whose step revert-pin has no health check after it; the process has the step verify-revert since the demo-environment kit's commit 8ebb204, and the exemption goes when each of its cluster projects has deployed a release made after that to prod.",
+	}
+}
+
+test_the_exemption_covers_every_environment_of_cmdemo3 if {
+	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "tdd", aks_before, [])
+	result.allowed == true
+	startswith(result.reason, "Exempt: its releases made before 2026-10-08")
+}
+
+test_cmdemo3_with_a_health_check_after_the_rollback_complies if {
+	policy.result == {"allowed": true} with input as policy_input.deployment("cmdemo3-demo", "prod", aks, [])
+}
+
+test_cmdemo3_without_a_rollback_step_complies if {
+	result := policy.result with input as policy_input.deployment("cmdemo3-demo", "prod", [sign_off, update, verify], [])
+	result == {"allowed": true, "reason": "No rollback step runs in this deployment."}
+}
+
+test_the_exemption_does_not_cover_the_other_demo_spaces if {
+	result := policy.result with input as policy_input.deployment("cmdemo1-demo", "prod", aks_before, [])
+	result == {
+		"allowed": false,
+		"action": "warn",
+		"reason": "Step revert-pin puts the earlier version back in service with no health check after it: add a step after it whose slug starts with verify- (the kit's verify-revert).",
+	}
+}
+
+test_the_exemption_does_not_cover_the_named_spaces if {
+	result := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", aks_before, [])
+	result.allowed == false
 }
