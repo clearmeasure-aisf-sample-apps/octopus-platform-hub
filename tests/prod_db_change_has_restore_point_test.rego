@@ -29,14 +29,23 @@ test_prod_in_the_bootcamp_space_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("churchbulletin", "prod", [dbup, update], [])
 }
 
+test_prod_in_the_two_named_spaces_of_the_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("cmfleet", "prod", [sign_off, update], [])
+	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, pin, update], [])
+}
+
 test_other_environments_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo", "tdd", kit, [])
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "tdd", [dbup, update], [])
+	policy.evaluate == false with input as policy_input.deployment("cmfleet", "uat", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo-sites", "tdd", [migrate], [])
 }
 
 test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("default", "prod", [migrate], [])
 	policy.evaluate == false with input as policy_input.deployment("training", "prod", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [migrate], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
@@ -76,6 +85,11 @@ test_a_step_in_parallel_between_them_keeps_the_order if {
 		{"StartTrigger": "StartAfterPrevious", "Steps": ["migrate-id"]},
 	]
 	policy.result == {"allowed": true} with input as policy_input.with_execution(deployment, execution)
+}
+
+test_a_named_space_without_a_database_change_is_allowed if {
+	result := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, pin, update], [])
+	result == {"allowed": true, "reason": "No database change runs in this deployment."}
 }
 
 # Violations
@@ -124,6 +138,11 @@ test_a_disabled_restore_point_violates if {
 	result := policy.result with input as policy_input.deployment("cmdemo1-demo", "prod", steps, [])
 	result.allowed == false
 	result.reason == "Step migrate-database changes the database, but its restore point does not run: step record-restore-point is disabled."
+}
+
+test_a_migration_without_restore_point_in_a_named_space_violates if {
+	result := policy.result with input as policy_input.deployment("cmfleet", "prod", [sign_off, migrate, update], [])
+	result.allowed == false
 }
 
 # Exemptions

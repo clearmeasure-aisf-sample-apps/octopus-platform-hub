@@ -1,29 +1,29 @@
 {
   "Environment": {
-    "Id": "Environments-642",
+    "Id": "Environments-669",
     "Name": "prod",
     "Slug": "prod",
     "Tags": []
   },
   "Project": {
-    "Id": "Projects-1001",
-    "Name": "cmdemo2-dashboard",
-    "Slug": "cmdemo2-dashboard",
+    "Id": "Projects-1033",
+    "Name": "cmfleet-dashboard",
+    "Slug": "cmfleet-dashboard",
     "Tags": []
   },
   "Space": {
-    "Id": "Spaces-356",
-    "Name": "cmdemo2 demo",
-    "Slug": "cmdemo2-demo"
+    "Id": "Spaces-378",
+    "Name": "cmfleet",
+    "Slug": "cmfleet"
   },
   "ProjectGroup": {
-    "Id": "ProjectGroups-777",
-    "Name": "cmdemo2",
-    "Slug": "cmdemo2"
+    "Id": "ProjectGroups-799",
+    "Name": "cmfleet",
+    "Slug": "cmfleet-1"
   },
   "Steps": [
     {
-      "Id": "6a387cb2-d0b7-4f65-a6d4-3d74102c6d15",
+      "Id": "f17cd148-c707-427f-93fd-8980f9e11709",
       "Slug": "sign-off",
       "ActionType": "Octopus.Manual",
       "Enabled": true,
@@ -36,20 +36,7 @@
       "Packages": []
     },
     {
-      "Id": "85a443c3-7e67-4aaf-a380-2653e2ebe982",
-      "Slug": "pin-version",
-      "ActionType": "Octopus.Script",
-      "Enabled": true,
-      "IsRequired": false,
-      "IsConditional": false,
-      "Source": {
-        "Type": "",
-        "SlugOrId": ""
-      },
-      "Packages": []
-    },
-    {
-      "Id": "d2aeb8c2-f355-4610-b78a-84ae1a16a49f",
+      "Id": "8ce9b3b4-2413-4b8c-89e5-23c67f9f9de9",
       "Slug": "update-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -61,11 +48,11 @@
       },
       "Packages": [
         {
-          "Id": "1013731e-0352-42cf-90ff-05b3e1096bd8",
-          "Name": "cmdemo2-dashboard",
-          "Version": "1.0.30",
+          "Id": "1ca6a900-9c71-4075-8817-8fe71d624354",
+          "Name": "cmfleet-dashboard",
+          "Version": "1.0.25",
           "Feed": {
-            "Id": "Feeds-1851",
+            "Id": "Feeds-1875",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -75,7 +62,7 @@
       ]
     },
     {
-      "Id": "2294e3b9-be01-4322-ab0a-82661c43ffdb",
+      "Id": "838469b5-3f20-4a9a-a298-9b15d1ef9033",
       "Slug": "verify-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -85,12 +72,25 @@
         "Type": "",
         "SlugOrId": ""
       },
-      "Packages": []
+      "Packages": [
+        {
+          "Id": "1312fe9e-258e-434b-8cc7-e3e57924fd48",
+          "Name": "cmfleet-dashboard",
+          "Version": "1.0.25",
+          "Feed": {
+            "Id": "Feeds-1875",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
     },
     {
-      "Id": "2d004ce5-1bc1-4a3b-a49d-12ecf9cd0cb7",
-      "Slug": "revert-pin",
-      "ActionType": "Octopus.Script",
+      "Id": "4cc509e5-91e8-4519-9cb4-4844ec4ce895",
+      "Slug": "run-acceptance-tests",
+      "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
       "IsRequired": false,
       "IsConditional": true,
@@ -98,7 +98,20 @@
         "Type": "",
         "SlugOrId": ""
       },
-      "Packages": []
+      "Packages": [
+        {
+          "Id": "28f87b94-c93a-47c2-97ec-120899b9f702",
+          "Name": "cmfleet-dashboard",
+          "Version": "1.0.25",
+          "Feed": {
+            "Id": "Feeds-1875",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
     }
   ],
   "SkippedSteps": [],
@@ -106,31 +119,25 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "6a387cb2-d0b7-4f65-a6d4-3d74102c6d15"
+        "f17cd148-c707-427f-93fd-8980f9e11709"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "85a443c3-7e67-4aaf-a380-2653e2ebe982"
+        "8ce9b3b4-2413-4b8c-89e5-23c67f9f9de9"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "d2aeb8c2-f355-4610-b78a-84ae1a16a49f"
+        "838469b5-3f20-4a9a-a298-9b15d1ef9033"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "2294e3b9-be01-4322-ab0a-82661c43ffdb"
-      ]
-    },
-    {
-      "StartTrigger": "StartAfterPrevious",
-      "Steps": [
-        "2d004ce5-1bc1-4a3b-a49d-12ecf9cd0cb7"
+        "4cc509e5-91e8-4519-9cb4-4844ec4ce895"
       ]
     }
   ],
@@ -140,10 +147,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T05:16:40.557Z",
+  "CreatedAt": "2026-10-08T08:46:23.283Z",
   "Release": {
-    "Id": "Releases-50119",
-    "Name": "1.0.30",
-    "Version": "1.0.30"
+    "Id": "Releases-50132",
+    "Name": "1.0.25",
+    "Version": "1.0.25"
   }
 }

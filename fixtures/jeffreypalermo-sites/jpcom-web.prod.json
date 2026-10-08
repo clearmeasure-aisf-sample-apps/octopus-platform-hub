@@ -1,0 +1,264 @@
+{
+  "Environment": {
+    "Id": "Environments-663",
+    "Name": "prod",
+    "Slug": "prod",
+    "Tags": []
+  },
+  "Project": {
+    "Id": "Projects-1023",
+    "Name": "jpcom-web",
+    "Slug": "jpcom-web",
+    "Tags": []
+  },
+  "Space": {
+    "Id": "Spaces-375",
+    "Name": "JeffreyPalermo - Sites",
+    "Slug": "jeffreypalermo-sites"
+  },
+  "ProjectGroup": {
+    "Id": "ProjectGroups-795",
+    "Name": "jpcom",
+    "Slug": "jpcom"
+  },
+  "Steps": [
+    {
+      "Id": "f9160e41-0bc5-4991-95f3-eaa03f50cacf",
+      "Slug": "sign-off",
+      "ActionType": "Octopus.Manual",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "348c89e5-f1fa-4026-8c5f-321dbc6d6fc3",
+      "Slug": "pin-version",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "2d8dc6f4-f0c1-4c84-a348-f71ff559beea",
+      "Slug": "update-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "eb6a931c-8c13-4ff8-9bd0-0a5bc6b92607",
+          "Name": "jpcom-web",
+          "Version": "1.0.58",
+          "Feed": {
+            "Id": "Feeds-1867",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "37252459-7585-473a-ae70-cad4c88e7e8c",
+      "Slug": "verify-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "ae386881-d019-45cb-9f5c-07e734d925c5",
+          "Name": "jpcom-web",
+          "Version": "1.0.58",
+          "Feed": {
+            "Id": "Feeds-1867",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "2e9ec3b1-9cfa-4555-9f00-86fb4ee7e529",
+      "Slug": "record-nodes",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "9646d9eb-f753-4c23-8195-5843c9b9f1a4",
+      "Slug": "revert-deployable",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "3f6bef02-b2d2-4849-8d55-4fc4435aa535",
+          "Name": "jpcom-web",
+          "Version": "1.0.58",
+          "Feed": {
+            "Id": "Feeds-1867",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "a739a90b-446c-4887-8732-33201cbeffad",
+      "Slug": "verify-revert",
+      "ActionType": "Octopus.AzurePowerShell",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": [
+        {
+          "Id": "5822fb17-c099-4f15-b663-6a94f17f4e82",
+          "Name": "jpcom-web",
+          "Version": "1.0.58",
+          "Feed": {
+            "Id": "Feeds-1867",
+            "Name": "Octopus Server (built-in)",
+            "Slug": "octopus-server-built-in",
+            "Type": "BuiltIn",
+            "Source": "Space"
+          }
+        }
+      ]
+    },
+    {
+      "Id": "f26cf0a6-2b4f-4577-9560-01b7a23b1dd0",
+      "Slug": "record-nodes-after-revert",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "ce84192e-efe0-4df9-a41b-6de043b951a2",
+      "Slug": "revert-pin",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    }
+  ],
+  "SkippedSteps": [],
+  "Execution": [
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "f9160e41-0bc5-4991-95f3-eaa03f50cacf"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "348c89e5-f1fa-4026-8c5f-321dbc6d6fc3"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "2d8dc6f4-f0c1-4c84-a348-f71ff559beea"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "37252459-7585-473a-ae70-cad4c88e7e8c"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "2e9ec3b1-9cfa-4555-9f00-86fb4ee7e529"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "9646d9eb-f753-4c23-8195-5843c9b9f1a4"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "a739a90b-446c-4887-8732-33201cbeffad"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "f26cf0a6-2b4f-4577-9560-01b7a23b1dd0"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "ce84192e-efe0-4df9-a41b-6de043b951a2"
+      ]
+    }
+  ],
+  "RequiresApproval": false,
+  "Actor": {
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
+  },
+  "CreatedAt": "2026-10-08T15:59:48.856Z",
+  "Release": {
+    "Id": "Releases-50157",
+    "Name": "1.0.58",
+    "Version": "1.0.58"
+  }
+}

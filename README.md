@@ -4,7 +4,9 @@ The [Platform Hub](https://octopus.com/docs/platform-hub) repository of the Octo
 https://clearmeasure.octopus.app. Platform Hub reads one Git repository for the whole instance; this repository is the
 only source of the instance's process templates and policies (decision D2 of the Platform Hub plan).
 
-**Status: connected since 2026-10-07; both policies active in warn mode.**
+**Status: connected since 2026-10-07; three policies active in warn mode. Written here and not published yet
+(2026-10-08): the scope with the spaces `cmfleet` and `jeffreypalermo-sites`, and the fourth policy
+`rollback_has_health_check`.**
 
 - **Version control.** Platform Hub reads this repository at `main`, base path `.octopus`, with the default branch
   protected and **no credentials**: the repository is public, so Octopus only reads. Nothing can be saved from the
@@ -13,7 +15,14 @@ only source of the instance's process templates and policies (decision D2 of the
 - **Policies.** Three are published and active; all warn and block nothing:
   `prod_has_sign_off` 1.1.0 (1.0.0 until the process template was renamed), `prod_db_change_has_restore_point` 1.0.0,
   and `app_deployment_has_health_check` 1.0.0 (2026-10-07: every application deployment, to any environment, asks
-  the app's health endpoint after the update).
+  the app's health endpoint after the update). Each of the three is published with the scope it had then: the
+  spaces whose slug ends in `-demo`, and `churchbulletin` for the first two.
+- **To publish** (2026-10-08, the operator, once this is on `main`): the scope of all three now names the spaces
+  `cmfleet` and `jeffreypalermo-sites` too, and a policy whose scope changed needs a new version, so
+  `prod_has_sign_off` **1.2.0**, `prod_db_change_has_restore_point` **1.1.0** and
+  `app_deployment_has_health_check` **1.1.0**; and the new policy `rollback_has_health_check` **1.0.0**. Each is
+  then activated, as 1.1.0 of the sign-off was. Until then Octopus evaluates nothing in those two spaces and no
+  rollback anywhere.
 - **Seen at work** in a throwaway space (`cmprobe demo`, deleted afterwards), four prod deployments:
 
   | Process | Sign-off policy | Restore-point policy | Task |
@@ -31,8 +40,8 @@ only source of the instance's process templates and policies (decision D2 of the
   leaves this deployment out; such a step has `Enabled: true` and `IsConditional: true`, exactly like a step scoped to
   include it. A policy cannot tell a sign-off that runs in prod from one scoped away from it. The demo-environment
   kit's fleet reads the process with its scopes and reports that case (`policy/<slug>/<project>/sign-off`,
-  `.../restore-point` and `.../health-check` of `test-fleet.ps1`); the policies here catch what the fleet cannot see, a step disabled or
-  skipped in one deployment. Both stay.
+  `.../restore-point`, `.../health-check` and `.../rollback-check` of `test-fleet.ps1`); the policies here catch what
+  the fleet cannot see, a step disabled or skipped in one deployment. Both stay.
 - **Not done:** the process template `cmdemo-process-template` is still a draft and shared with no space;
   [How it gets connected](#how-it-gets-connected) keeps the remaining steps.
 
@@ -40,14 +49,20 @@ only source of the instance's process templates and policies (decision D2 of the
 
 | System | Space | Policies | Templates |
 |---|---|---|---|
-| cmdemo1 | `cmdemo1 demo` (Spaces-355, slug `cmdemo1-demo`) | both | `cmdemo-process-template` once the kit uses it (plan phase 4) |
-| cmdemo2 | `cmdemo2 demo` (Spaces-356, slug `cmdemo2-demo`) | both | the same |
-| cmdemo3 | `cmdemo3 demo` (Spaces-357, slug `cmdemo3-demo`) | both | the same |
-| bootcamp | `ChurchBulletin` (Spaces-315, slug `churchbulletin`), project `ChurchBulletin-gh` | both; exempt from the sign-off | only if its owners adopt them (D6) |
+| cmdemo1 | `cmdemo1 demo` (Spaces-355, slug `cmdemo1-demo`) | all four | `cmdemo-process-template` once the kit uses it (plan phase 4) |
+| cmdemo2 | `cmdemo2 demo` (Spaces-356, slug `cmdemo2-demo`) | all four | the same |
+| cmdemo3 | `cmdemo3 demo` (Spaces-357, slug `cmdemo3-demo`) | all four | the same |
+| cmfleet | `cmfleet` (Spaces-378, slug `cmfleet`), project `cmfleet-dashboard` | all four, by the name of the space | none planned: its process is made by hand |
+| jpcom | `JeffreyPalermo - Sites` (Spaces-375, slug `jeffreypalermo-sites`), projects `jpcom-system`, `jpcom-web` and `jpcom-dashboard` | all four, by the name of the space | not decided |
+| bootcamp | `ChurchBulletin` (Spaces-315, slug `churchbulletin`), project `ChurchBulletin-gh` | the sign-off, from which it is exempt, and the restore point; neither health check | only if its owners adopt them (D6) |
 
 The policies apply to every space whose slug ends in `-demo` (the demo-environment kit names each space
-`<slug> demo`), so a new demo system joins with no change here, and to `churchbulletin`. No other space of the
-instance is in their scope.
+`<slug> demo`), so a new demo system joins with no change here; to the two systems of the fleet whose space has
+another name, by the slug of that space (`cmfleet` and `jeffreypalermo-sites`, the set `fleet_spaces` in each
+policy's scope; decision 2026-10-08, Jeffrey); and, for the sign-off and the restore point, to `churchbulletin`. No
+other space of the instance is in their scope: a space joins by name, with a change here (its slug in
+`fleet_spaces` of each policy, a test, its fixtures) and a new version of each policy. The column says what the
+files of this repository hold; what Octopus has published is in the status above.
 
 ## Layout
 
@@ -57,6 +72,7 @@ instance is in their scope.
     prod_has_sign_off.ocl                policy, warn mode
     prod_db_change_has_restore_point.ocl policy, warn mode
     app_deployment_has_health_check.ocl  policy, warn mode
+    rollback_has_health_check.ocl        policy, warn mode
   process-templates/
     cmdemo-process-template.ocl          process template, DRAFT
 fixtures/                                the policy input of real deployments, and manifest.json
@@ -91,7 +107,7 @@ Octopus reads only the base path, `.octopus`. The layout follows the documentati
 
 ## Policies
 
-Both start in **warn** mode (D5): a violation lets the deployment run and is recorded in the task log, the project
+All start in **warn** mode (D5): a violation lets the deployment run and is recorded in the task log, the project
 dashboard and the audit log. The `-demo` spaces move to block after two clean weeks (plan phase 7), through a new
 policy version.
 
@@ -99,10 +115,12 @@ policy version.
 |---|---|---|
 | [`prod_has_sign_off`](.octopus/policies/prod_has_sign_off.ocl) "Deploy - Production has a sign-off" | A production deployment has a sign-off that runs: an enabled, not skipped step of type `Octopus.Manual`, or a step of the process template `cmdemo-process-template` | `churchbulletin`: the bootcamp has no Octopus approval by design; its master builds reach Prod after the TDD acceptance tests and the GitHub environment wait timers |
 | [`prod_db_change_has_restore_point`](.octopus/policies/prod_db_change_has_restore_point.ocl) "Deploy - Production database change has a restore point" | A production deployment whose process changes a database schema (step `migrate-database`, the bootcamp's `run-db-migrations`, or a step of the template `kit-migrate-database`) records a restore point first (step `record-restore-point`, or the template `kit-record-restore-point`), finished before the first change | `cmdemo3-demo`: cmdemo3 runs SQL Server Express in its AKS cluster, which has no point-in-time restore |
-| [`app_deployment_has_health_check`](.octopus/policies/app_deployment_has_health_check.ocl) "Deploy - Application deployment has a health check" | In the spaces whose slug ends in `-demo`, a deployment that updates an application (step `update-deployable`), to any environment, asks the application's health endpoint afterwards: a step `verify-deployable` that is enabled, not skipped, and starts after the last update step has finished. A deployment that updates no application complies. Warn mode | None. The bootcamp's space is out of scope, not exempt: its process has no health check step, and its owners decide whether it gets one |
+| [`app_deployment_has_health_check`](.octopus/policies/app_deployment_has_health_check.ocl) "Deploy - Application deployment has a health check" | A deployment that updates an application (step `update-deployable`), to any environment, asks the application's health endpoint afterwards: a step `verify-deployable` that is enabled, not skipped, and starts after the last update step has finished. A deployment that updates no application complies. Warn mode | None. The bootcamp's space is out of scope, not exempt: its process has no health check step, and its owners decide whether it gets one |
+| [`rollback_has_health_check`](.octopus/policies/rollback_has_health_check.ocl) "Deploy - A rollback has a health check" | A deployment, to any environment, in which a rollback step runs asks the application's health after it: a step whose slug starts with `verify-` (the kit's `verify-revert`) that is enabled, not skipped, comes after the last rollback step and starts once that step has finished. A rollback step is `revert-deployable`; `revert-pin` is one too where Argo CD deploys what the pin says, which the policy reads from the step `update-deployable` having an action type that starts with `Octopus.ArgoCD` (runtime aks-argocd, `Octopus.ArgoCDUpdateImageTags`). In every other process `revert-pin` only makes Git say again what runs, and is no rollback. A deployment in which no rollback step runs complies ("No rollback step runs in this deployment."). The fleet's decisions 0018 and 0022 in the demo-environment kit. Warn mode | None. The bootcamp's space is out of scope: its process has no rollback step |
 
-- **Scope** (both): deployments, not runbook runs (`not input.Runbook`), to the environment `prod`, in a space whose
-  slug ends in `-demo` or is `churchbulletin`.
+- **Scope**: deployments, not runbook runs (`not input.Runbook`), in a space whose slug ends in `-demo` or is in the
+  set `fleet_spaces` (`cmfleet`, `jeffreypalermo-sites`). The sign-off and the restore point: to the environment
+  `prod` only, and in the space `churchbulletin` as well. The two health checks: to every environment.
 - **Rego**: Rego v1, as the documentation's examples write it: the keywords `if`, `in` and `contains` with no import,
   the rules `evaluate` (scope) and `result` (conditions), and a result of the documented
   [output schema](https://octopus.com/docs/platform-hub/policies/schema#output-schema): `allowed`, `reason`, `action`.
@@ -111,6 +129,14 @@ policy version.
   `Space.Slug`, `Environment.Slug`, `Runbook` (absent for deployments), `Steps[].Id`, `.Slug`, `.ActionType`,
   `.Enabled`, `.Source.Type`, `.Source.SlugOrId`, `SkippedSteps` (step IDs) and `Execution[].StartTrigger`, `.Steps`.
   The input has no step name, so steps are matched by slug.
+- **What the rollback policy cannot see.** The input has no run condition of a step (`IsConditional` is also true for
+  an environment scope), so `rollback_has_health_check` cannot tell whether the health check runs when the deployment
+  has failed, which is when a rollback runs: a `verify-` step after the rollback with the condition Success satisfies
+  the policy and never runs after a rollback. The fleet's rule reads the condition from the process
+  (`policy/<slug>/<project>/rollback-check` of `test-fleet.ps1`: Failure or Always). The policy catches what the
+  fleet cannot see: the health check disabled, or skipped in one deployment.
+- **"After"**, for both health checks, mirrors "before": the check comes later in the process, and an execution group
+  after the update's or the rollback's, up to the check's, waits for the steps before it (`StartAfterPrevious`).
 - **"Before"** means the restore point finishes before the first change starts: it comes earlier in the process, and an
   execution group after it, up to the change's, waits for the steps before it (`StartAfterPrevious`). A restore point
   that starts with the migration (`StartWithPrevious`) does not count.
@@ -157,17 +183,26 @@ first.
 
 ## Compliance preview
 
-[PREVIEW.md](PREVIEW.md): both policies evaluated with `opa eval` over the fixtures, one row per system and project.
-On 2026-10-05, the eight production deployments of cmdemo1, cmdemo2 and cmdemo3 comply with both policies; the
-bootcamp is exempt from the sign-off and violates the restore-point rule (its step `run-db-migrations` changes the
-Prod database with no restore point first). cmdemo3, once exempt from the restore point, has no exemption any
-more: since cmdemo3-system #14 (2026-10-05) its step Record restore point takes a verified backup before every prod
-deployment. Steps that change data but not the schema (Set employee middle names, Initialize database) do not count as
-database changes (decision 2026-10-05).
+[PREVIEW.md](PREVIEW.md): every policy evaluated with `opa eval` over the fixtures, one row per system and project.
+On 2026-10-08, the sixteen production deployments of cmdemo1, cmdemo2, cmdemo3, cmfleet and jpcom comply with the
+sign-off, the restore point and the health check after the update; the four of the two spaces named on that day
+(`cmfleet-dashboard`, `jpcom-system`, `jpcom-web`, `jpcom-dashboard`) are among them. The bootcamp is exempt from
+the sign-off and violates the restore-point rule (its step `run-db-migrations` changes the Prod database with no
+restore point first). cmdemo3, once exempt from the restore point, has no exemption any more: since cmdemo3-system
+#14 (2026-10-05) its step Record restore point takes a verified backup before every prod deployment. Steps that
+change data but not the schema (Set employee middle names, Initialize database) do not count as database changes
+(decision 2026-10-05).
+
+Under `rollback_has_health_check`, `jpcom-web` complies (Revert deployable, then Verify revert), and thirteen of
+the sixteen have no rollback step: in the default runtime `revert-pin` is not one. Two violate it, `cmdemo3-ui`
+2.4.22 and `cmdemo3-dashboard` 1.0.13: a fixture is the process its deployment ran, and both releases were made
+before those processes got the step Verify revert after Revert pin (the kit's commit 8ebb204, 2026-10-08). The
+processes have it now, so the next release of each complies; a redeployment of those two releases would get the
+warning.
 
 ## Fixtures
 
-`scripts/build-fixtures.ps1` builds them; the operator runs it, with GET requests only. For each of the four spaces,
+`scripts/build-fixtures.ps1` builds them; the operator runs it, with GET requests only. For each of the six spaces,
 the most recent prod deployment of each project becomes `fixtures/<space slug>/<project slug>.prod.json`, and the
 latest tdd deployment of cmdemo1-ui is the out-of-scope case. Each file is the policy input as documented, checked
 against [schema/policy-input.schema.json](schema/policy-input.schema.json) (the JSON schema of the
@@ -236,6 +271,10 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    `scripts/test.ps1` now checks. Not done: the replay in the Evaluations tab against earlier runs (the API has no
    endpoint for it). Next: watch the promotions to prod of the demo systems (3.3); a deployment that complies logs
    "Compliant with policy ..." under "Apply compliance policies".
+   **Next, not done** (2026-10-08): publish and activate the four versions the status above names
+   (`prod_has_sign_off` 1.2.0, `prod_db_change_has_restore_point` 1.1.0, `app_deployment_has_health_check` 1.1.0,
+   `rollback_has_health_check` 1.0.0). The new policy's Rego calls `startswith`, which no published policy has
+   used yet: the publish is where Octopus accepts or refuses it.
 5. **Templates (phase 4).** After the spike: publish `cmdemo-process-template` 1.0.0 as a pre-release, share it with the canary
    space only, and remove its DRAFT mark here.
 
@@ -257,6 +296,8 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    engine). The policies use only common Rego v1: `if`, `in`, `contains`, `else`, comprehensions, `count`, `min`,
    `sprintf`, `concat`, `endswith`.
    **Answer:** not known by name, but it refuses user-defined functions at publish. Values, sets, arrays, comprehensions, `some ... in`, `not`, `count`, `min`, `sprintf` and `concat` are accepted and evaluate as opa does.
+   `max` and `endswith` are in the published `app_deployment_has_health_check` 1.0.0. `startswith`
+   (`rollback_has_health_check`) has not been through a publish yet.
 6. How the task log and audit log show an allowed result that carries a `reason` (exempt, no database change).
    **Answer:** an allowed result with a reason logs "Compliant with policy \"...\" (<reason>)" at Info level: no warning. A violation in warn mode logs a Warning with the reason, and the task ends Success with warnings.
 7. Whether Octopus accepts the Git-authored `cmdemo-process-template.ocl` as it is (name, icon, Teams parameter), and the spike

@@ -1,0 +1,182 @@
+name = "Deploy - A rollback has a health check"
+description = "Every deployment of the demo systems (spaces whose slug ends in -demo) and of the systems cmfleet and jpcom (spaces cmfleet and jeffreypalermo-sites), to any environment, whose process puts the earlier version of an application back in service when an update fails asks the application's health afterwards: a step whose slug starts with verify- that is enabled, not skipped, and starts after the last rollback step has finished. A rollback step is revert-deployable, and revert-pin where Argo CD deploys the pin (the step update-deployable is of an Octopus.ArgoCD type). A deployment in which no rollback step runs complies. The policy input has no run condition, so the policy cannot see whether the health check runs when the deployment has failed; the fleet reads that. Warn mode first (decision D5)."
+violation_action = "warn"
+violation_reason = "A rollback needs a health check after it."
+
+conditions {
+    rego = <<-EOT
+            package rollback_has_health_check
+
+            # No user-defined functions: Octopus refuses them at publish. Every rule is a value, a set or an array.
+
+            # Warn first (decision D5), as the other policies.
+            violation_action := "warn"
+
+            # The steps that put the earlier version of an application back in service when an update has failed, by step slug:
+            # "Revert deployable" of an application that brings its own runtime (the fleet's decision 0018).
+            rollback_slugs := {"revert-deployable"}
+
+            # "Revert pin" puts the earlier version back in Git. Where Argo CD deploys what Git says (runtime aks-argocd), that is
+            # the rollback (the fleet's decision 0022); in every other process it only makes Git say again what runs, and nothing
+            # is put back in service by it. The runtime is read from the step that updates the application: Argo CD's is
+            # Octopus.ArgoCDUpdateImageTags.
+            pin_rollback_slugs := {"revert-pin"}
+
+            update_slugs := {"update-deployable"}
+
+            # A step whose slug starts with this asks an application's health: the kit's "Verify revert" and "Verify deployable".
+            health_check_prefix := "verify-"
+
+            # The policy input has no run condition of a step (IsConditional is also true for an environment scope), so this
+            # policy cannot see whether the health check runs when the deployment has failed, which is when a rollback runs. The
+            # fleet's rule reads that from the process (policy/<slug>/<project>/rollback-check of test-fleet.ps1).
+
+            default result := {"allowed": false, "action": "warn", "reason": "A rollback needs a health check after it."}
+
+            result := {"allowed": true, "reason": "No rollback step runs in this deployment."} if {
+            	count(rollbacks) == 0
+            }
+
+            result := {"allowed": true} if {
+            	count(rollbacks) > 0
+            	checked
+            }
+
+            result := {"allowed": false, "action": violation_action, "reason": violation_reason} if {
+            	count(rollbacks) > 0
+            	not checked
+            }
+
+            argo_cd_deploys if {
+            	some step in input.Steps
+            	step.Slug in update_slugs
+            	startswith(step.ActionType, "Octopus.ArgoCD")
+            }
+
+            rollback_ids contains step.Id if {
+            	some step in input.Steps
+            	step.Slug in rollback_slugs
+            }
+
+            rollback_ids contains step.Id if {
+            	argo_cd_deploys
+            	some step in input.Steps
+            	step.Slug in pin_rollback_slugs
+            }
+
+            health_check_ids contains step.Id if {
+            	some step in input.Steps
+            	startswith(step.Slug, health_check_prefix)
+            }
+
+            # A step runs in this deployment when it is enabled and not skipped.
+            running_ids contains step.Id if {
+            	some step in input.Steps
+            	step.Enabled
+            	not step.Id in input.SkippedSteps
+            }
+
+            # Positions in input.Steps (the process order) of the rollback steps that run.
+            rollbacks := [i |
+            	some i, step in input.Steps
+            	step.Id in rollback_ids
+            	step.Id in running_ids
+            ]
+
+            last_rollback := max(rollbacks)
+
+            # Positions of the health checks that come after the last rollback step, and of those among them that run.
+            later_health_checks := [i |
+            	some i, step in input.Steps
+            	step.Id in health_check_ids
+            	i > last_rollback
+            ]
+
+            health_checks := [i |
+            	some i in later_health_checks
+            	input.Steps[i].Id in running_ids
+            ]
+
+            # A health check counts when it comes after the last rollback step and starts once that step has finished.
+            checked if {
+            	some i in health_checks
+            	i > last_rollback
+            	not i in starts_with_the_rollback
+            }
+
+            # The health checks that start while the last rollback step still runs: no execution group after the rollback step's,
+            # up to and including the health check's, waits for the steps before it (StartAfterPrevious).
+            starts_with_the_rollback contains i if {
+            	some i in health_checks
+            	some group_a, execution_a in input.Execution
+            	input.Steps[last_rollback].Id in execution_a.Steps
+            	some group_b, execution_b in input.Execution
+            	input.Steps[i].Id in execution_b.Steps
+            	group_a < group_b
+            	waits := [g |
+            		some g, execution in input.Execution
+            		g > group_a
+            		g <= group_b
+            		execution.StartTrigger == "StartAfterPrevious"
+            	]
+            	count(waits) == 0
+            }
+
+            rollback := input.Steps[last_rollback].Slug
+
+            violation_reason := sprintf("Step %s puts the earlier version back in service with no health check after it: add a step after it whose slug starts with verify- (the kit's verify-revert).", [rollback]) if {
+            	count(later_health_checks) == 0
+            }
+
+            violation_reason := sprintf("Step %s puts the earlier version back in service, but the health check after it does not run: %s.", [rollback, concat("; ", not_running)]) if {
+            	count(later_health_checks) > 0
+            	count(health_checks) == 0
+            }
+
+            violation_reason := sprintf("The health check (%s) starts before step %s has finished.", [concat(", ", [input.Steps[i].Slug | some i in health_checks]), rollback]) if {
+            	count(later_health_checks) > 0
+            	count(health_checks) > 0
+            }
+
+            # Why each health check after the rollback does not run: disabled, or else skipped in this deployment.
+            disabled_ids contains step.Id if {
+            	some i in later_health_checks
+            	step := input.Steps[i]
+            	not step.Enabled
+            }
+
+            state_word := {true: "disabled", false: "skipped"}
+
+            not_running := [reason |
+            	some i in later_health_checks
+            	step := input.Steps[i]
+            	disabled := step.Id in disabled_ids
+            	reason := sprintf("step %s is %s", [step.Slug, state_word[disabled]])
+            ]
+            EOT
+}
+
+scope {
+    rego = <<-EOT
+            package rollback_has_health_check
+
+            # Deployments to every environment in the spaces of the kit's demo systems (the kit names each space
+            # "<slug> demo", so its slug ends in -demo) and of the fleet's two systems named below. Runbook runs are out of
+            # scope, and so is every other space of the instance. The bootcamp's space is not in scope: its process has no
+            # rollback step.
+            default evaluate := false
+
+            evaluate if {
+            	not input.Runbook
+            	in_scope_space
+            }
+
+            # The systems of the fleet whose space has another name, by the slug of that space: cmfleet (the fleet health
+            # dashboard) and jeffreypalermo-sites (jpcom; its space is "JeffreyPalermo - Sites"). A space joins by name here.
+            fleet_spaces := {"cmfleet", "jeffreypalermo-sites"}
+
+            in_scope_space if endswith(input.Space.Slug, "-demo")
+
+            in_scope_space if input.Space.Slug in fleet_spaces
+            EOT
+}

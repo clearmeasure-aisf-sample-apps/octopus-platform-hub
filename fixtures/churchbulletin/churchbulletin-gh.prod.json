@@ -63,7 +63,7 @@
         {
           "Id": "blue-ring",
           "Name": "ChurchBulletin.Database",
-          "Version": "2.4.3827"
+          "Version": "2.4.3830"
         }
       ]
     },
@@ -133,11 +133,11 @@
     "Username": "redacted-person",
     "Type": "User"
   },
-  "CreatedAt": "2026-10-05T05:56:12.710Z",
+  "CreatedAt": "2026-10-05T13:20:54.267Z",
   "Release": {
-    "Id": "Releases-49872",
-    "Name": "2.4.3827",
-    "Version": "2.4.3827",
+    "Id": "Releases-49893",
+    "Name": "2.4.3830",
+    "Version": "2.4.3830",
     "GitRef": "refs/heads/master"
   }
 }

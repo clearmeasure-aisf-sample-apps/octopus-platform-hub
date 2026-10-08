@@ -76,7 +76,7 @@
         {
           "Id": "5156d181-9906-4872-9c2e-ef331d48bd67",
           "Name": "ChurchBulletin.Database",
-          "Version": "2.4.7",
+          "Version": "2.4.22",
           "Feed": {
             "Id": "Feeds-1851",
             "Name": "Octopus Server (built-in)",
@@ -115,7 +115,7 @@
         {
           "Id": "cced3bae-2b62-4439-9d46-77dde894d0c6",
           "Name": "ChurchBulletin.AcceptanceTests",
-          "Version": "2.4.7",
+          "Version": "2.4.22",
           "Feed": {
             "Id": "Feeds-1851",
             "Name": "Octopus Server (built-in)",
@@ -141,7 +141,7 @@
         {
           "Id": "8485ee74-5d2e-4e74-a59b-2fd98f54938b",
           "Name": "cmdemo2-ui",
-          "Version": "2.4.7",
+          "Version": "2.4.22",
           "Feed": {
             "Id": "Feeds-1851",
             "Name": "Octopus Server (built-in)",
@@ -206,7 +206,7 @@
         {
           "Id": "80ad42a8-7d73-477a-9923-4902d219dc78",
           "Name": "ChurchBulletin.AcceptanceTests",
-          "Version": "2.4.7",
+          "Version": "2.4.22",
           "Feed": {
             "Id": "Feeds-1851",
             "Name": "Octopus Server (built-in)",
@@ -312,10 +312,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-05T04:54:10.524Z",
+  "CreatedAt": "2026-10-08T07:50:06.924Z",
   "Release": {
-    "Id": "Releases-49866",
-    "Name": "2.4.7",
-    "Version": "2.4.7"
+    "Id": "Releases-50127",
+    "Name": "2.4.22",
+    "Version": "2.4.22"
   }
 }

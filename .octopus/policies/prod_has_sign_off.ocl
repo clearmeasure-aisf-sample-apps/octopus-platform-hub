@@ -1,5 +1,5 @@
 name = "Deploy - Production has a sign-off"
-description = "Every production deployment of the demo systems (spaces whose slug ends in -demo) and of the bootcamp (space churchbulletin) runs a sign-off: an enabled, not skipped manual intervention (Octopus.Manual) or a step of the process template cmdemo-process-template. Warn mode first (decision D5). Exempt: the bootcamp, which has no Octopus approval by design."
+description = "Every production deployment of the demo systems (spaces whose slug ends in -demo), of the systems cmfleet and jpcom (spaces cmfleet and jeffreypalermo-sites) and of the bootcamp (space churchbulletin) runs a sign-off: an enabled, not skipped manual intervention (Octopus.Manual) or a step of the process template cmdemo-process-template. Warn mode first (decision D5). Exempt: the bootcamp, which has no Octopus approval by design."
 violation_action = "warn"
 violation_reason = "A production deployment needs a sign-off that runs: an enabled manual intervention (Octopus.Manual) or the cmdemo-process-template process template, not skipped."
 
@@ -88,7 +88,8 @@ scope {
             package prod_has_sign_off
 
             # Deployments to prod in the spaces of the kit's demo systems (the kit names each space "<slug> demo", so
-            # its slug ends in -demo) and in the bootcamp's space ChurchBulletin. Runbook runs are out of scope.
+            # its slug ends in -demo), of the fleet's two systems named below and in the bootcamp's space ChurchBulletin.
+            # Runbook runs are out of scope, and so is every other space of the instance.
             default evaluate := false
 
             evaluate if {
@@ -97,7 +98,13 @@ scope {
             	in_scope_space
             }
 
+            # The systems of the fleet whose space has another name, by the slug of that space: cmfleet (the fleet health
+            # dashboard) and jeffreypalermo-sites (jpcom; its space is "JeffreyPalermo - Sites"). A space joins by name here.
+            fleet_spaces := {"cmfleet", "jeffreypalermo-sites"}
+
             in_scope_space if endswith(input.Space.Slug, "-demo")
+
+            in_scope_space if input.Space.Slug in fleet_spaces
 
             in_scope_space if input.Space.Slug == "churchbulletin"
             EOT

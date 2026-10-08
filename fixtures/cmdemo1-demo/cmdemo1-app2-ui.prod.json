@@ -63,7 +63,7 @@
         {
           "Id": "d5d602c9-6162-4c43-ba81-adc52ed4f31f",
           "Name": "cmdemo1-app2-ui",
-          "Version": "2.4.7",
+          "Version": "2.4.17",
           "Feed": {
             "Id": "Feeds-1847",
             "Name": "Octopus Server (built-in)",
@@ -140,10 +140,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-05T00:51:27.786Z",
+  "CreatedAt": "2026-10-08T09:37:15.726Z",
   "Release": {
-    "Id": "Releases-49842",
-    "Name": "2.4.7",
-    "Version": "2.4.7"
+    "Id": "Releases-50129",
+    "Name": "2.4.17",
+    "Version": "2.4.17"
   }
 }

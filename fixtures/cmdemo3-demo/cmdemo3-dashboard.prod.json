@@ -6,9 +6,9 @@
     "Tags": []
   },
   "Project": {
-    "Id": "Projects-986",
-    "Name": "cmdemo3-system",
-    "Slug": "cmdemo3-system",
+    "Id": "Projects-1021",
+    "Name": "cmdemo3-dashboard",
+    "Slug": "cmdemo3-dashboard",
     "Tags": []
   },
   "Space": {
@@ -23,7 +23,7 @@
   },
   "Steps": [
     {
-      "Id": "20c6a736-7c21-4124-810e-aa0dc76e0521",
+      "Id": "718ef103-8011-4ed7-a4d2-034ae9baf82d",
       "Slug": "sign-off",
       "ActionType": "Octopus.Manual",
       "Enabled": true,
@@ -36,9 +36,9 @@
       "Packages": []
     },
     {
-      "Id": "d4d50d05-6819-4d5e-b6da-dd28ddaaefa6",
-      "Slug": "prepare-environment",
-      "ActionType": "Octopus.Script",
+      "Id": "b9a9c0f2-ac6a-4aae-ae3b-8a1334ef0d93",
+      "Slug": "update-deployable",
+      "ActionType": "Octopus.ArgoCDUpdateImageTags",
       "Enabled": true,
       "IsRequired": false,
       "IsConditional": false,
@@ -46,23 +46,24 @@
         "Type": "",
         "SlugOrId": ""
       },
-      "Packages": []
+      "Packages": [
+        {
+          "Id": "0759ea56-2cea-4aab-acf8-2cd96bf6bd2f",
+          "Name": "cmdemo3/dashboard",
+          "Version": "1.0.13",
+          "Feed": {
+            "Id": "Feeds-1859",
+            "Name": "acr-cmdemo3",
+            "Slug": "acr-cmdemo3",
+            "Type": "AzureContainerRegistry",
+            "Source": "Space",
+            "Uri": "https://acrcmdemo3q3zmsi.azurecr.io"
+          }
+        }
+      ]
     },
     {
-      "Id": "d6e99e7c-0aac-431e-9d0f-5b3a2344ce50",
-      "Slug": "apply-environment",
-      "ActionType": "Octopus.ArgoCDUpdateManifests",
-      "Enabled": true,
-      "IsRequired": false,
-      "IsConditional": false,
-      "Source": {
-        "Type": "",
-        "SlugOrId": ""
-      },
-      "Packages": []
-    },
-    {
-      "Id": "85902a64-f9f3-4d67-bab4-0982264b00db",
+      "Id": "d9c8b73f-f62e-4d77-be0f-9725c20cff7b",
       "Slug": "measure-availability",
       "ActionType": "Octopus.Script",
       "Enabled": true,
@@ -75,8 +76,8 @@
       "Packages": []
     },
     {
-      "Id": "d954c908-2b1e-46a9-ba8f-566b6dbfa67b",
-      "Slug": "initialize-database",
+      "Id": "452f8789-5f8b-4b82-bfaf-0b1e6983116b",
+      "Slug": "write-dashboard-content",
       "ActionType": "Octopus.Script",
       "Enabled": true,
       "IsRequired": false,
@@ -88,12 +89,25 @@
       "Packages": []
     },
     {
-      "Id": "213d372c-9d5d-4f24-aa9d-fcb74f5f8c88",
-      "Slug": "verify-environment",
+      "Id": "8fcbf6f1-4595-4f24-a84c-96dd1a9663a9",
+      "Slug": "verify-deployable",
       "ActionType": "Octopus.Script",
       "Enabled": true,
       "IsRequired": false,
       "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "e212332d-b95d-4831-8bc4-489706ccca1d",
+      "Slug": "revert-pin",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": true,
       "Source": {
         "Type": "",
         "SlugOrId": ""
@@ -106,37 +120,37 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "20c6a736-7c21-4124-810e-aa0dc76e0521"
+        "718ef103-8011-4ed7-a4d2-034ae9baf82d"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "d4d50d05-6819-4d5e-b6da-dd28ddaaefa6"
-      ]
-    },
-    {
-      "StartTrigger": "StartAfterPrevious",
-      "Steps": [
-        "d6e99e7c-0aac-431e-9d0f-5b3a2344ce50"
+        "b9a9c0f2-ac6a-4aae-ae3b-8a1334ef0d93"
       ]
     },
     {
       "StartTrigger": "StartWithPrevious",
       "Steps": [
-        "85902a64-f9f3-4d67-bab4-0982264b00db"
+        "d9c8b73f-f62e-4d77-be0f-9725c20cff7b"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "d954c908-2b1e-46a9-ba8f-566b6dbfa67b"
+        "452f8789-5f8b-4b82-bfaf-0b1e6983116b"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "213d372c-9d5d-4f24-aa9d-fcb74f5f8c88"
+        "8fcbf6f1-4595-4f24-a84c-96dd1a9663a9"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "e212332d-b95d-4831-8bc4-489706ccca1d"
       ]
     }
   ],
@@ -146,10 +160,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T17:03:09.031Z",
+  "CreatedAt": "2026-10-08T02:57:40.259Z",
   "Release": {
-    "Id": "Releases-50161",
-    "Name": "1.0.49",
-    "Version": "1.0.49"
+    "Id": "Releases-50102",
+    "Name": "1.0.13",
+    "Version": "1.0.13"
   }
 }

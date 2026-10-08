@@ -1,29 +1,29 @@
 {
   "Environment": {
-    "Id": "Environments-642",
+    "Id": "Environments-663",
     "Name": "prod",
     "Slug": "prod",
     "Tags": []
   },
   "Project": {
-    "Id": "Projects-984",
-    "Name": "cmdemo2-system",
-    "Slug": "cmdemo2-system",
+    "Id": "Projects-1034",
+    "Name": "jpcom-dashboard",
+    "Slug": "jpcom-dashboard",
     "Tags": []
   },
   "Space": {
-    "Id": "Spaces-356",
-    "Name": "cmdemo2 demo",
-    "Slug": "cmdemo2-demo"
+    "Id": "Spaces-375",
+    "Name": "JeffreyPalermo - Sites",
+    "Slug": "jeffreypalermo-sites"
   },
   "ProjectGroup": {
-    "Id": "ProjectGroups-777",
-    "Name": "cmdemo2",
-    "Slug": "cmdemo2"
+    "Id": "ProjectGroups-795",
+    "Name": "jpcom",
+    "Slug": "jpcom"
   },
   "Steps": [
     {
-      "Id": "8f303eb7-8760-4d4f-982f-eb393abbc23d",
+      "Id": "1b9c9401-5b99-4327-b332-7c8bec68ceaa",
       "Slug": "sign-off",
       "ActionType": "Octopus.Manual",
       "Enabled": true,
@@ -36,8 +36,21 @@
       "Packages": []
     },
     {
-      "Id": "c16ed724-55a1-4684-a59e-7525f76544c2",
-      "Slug": "apply-environment",
+      "Id": "e48484a2-d7d6-4b34-8cd6-d750caebef4b",
+      "Slug": "pin-version",
+      "ActionType": "Octopus.Script",
+      "Enabled": true,
+      "IsRequired": false,
+      "IsConditional": false,
+      "Source": {
+        "Type": "",
+        "SlugOrId": ""
+      },
+      "Packages": []
+    },
+    {
+      "Id": "c5a49b97-320c-4471-8a05-63ff632dd003",
+      "Slug": "update-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
       "IsRequired": false,
@@ -48,11 +61,11 @@
       },
       "Packages": [
         {
-          "Id": "bfbe9893-6cd4-40f3-8fb6-37caa51ff5db",
-          "Name": "cmdemo2-system",
-          "Version": "1.0.47",
+          "Id": "460def63-710f-4c04-a776-374b18b7fa30",
+          "Name": "jpcom-dashboard",
+          "Version": "1.0.4",
           "Feed": {
-            "Id": "Feeds-1851",
+            "Id": "Feeds-1867",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -62,8 +75,8 @@
       ]
     },
     {
-      "Id": "a4c4b14c-6ef8-42bd-8f4e-1dae15ca7782",
-      "Slug": "grant-database-access",
+      "Id": "54dab973-c04b-4957-8a8e-661c536829e1",
+      "Slug": "verify-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
       "IsRequired": false,
@@ -75,12 +88,12 @@
       "Packages": []
     },
     {
-      "Id": "95209e83-452e-429f-84db-1c84d07936ef",
-      "Slug": "verify-environment",
-      "ActionType": "Octopus.AzurePowerShell",
+      "Id": "d151f5e2-6e03-4e25-b694-c41acaf64a88",
+      "Slug": "revert-pin",
+      "ActionType": "Octopus.Script",
       "Enabled": true,
       "IsRequired": false,
-      "IsConditional": false,
+      "IsConditional": true,
       "Source": {
         "Type": "",
         "SlugOrId": ""
@@ -93,25 +106,31 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "8f303eb7-8760-4d4f-982f-eb393abbc23d"
+        "1b9c9401-5b99-4327-b332-7c8bec68ceaa"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "c16ed724-55a1-4684-a59e-7525f76544c2"
+        "e48484a2-d7d6-4b34-8cd6-d750caebef4b"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "a4c4b14c-6ef8-42bd-8f4e-1dae15ca7782"
+        "c5a49b97-320c-4471-8a05-63ff632dd003"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "95209e83-452e-429f-84db-1c84d07936ef"
+        "54dab973-c04b-4957-8a8e-661c536829e1"
+      ]
+    },
+    {
+      "StartTrigger": "StartAfterPrevious",
+      "Steps": [
+        "d151f5e2-6e03-4e25-b694-c41acaf64a88"
       ]
     }
   ],
@@ -121,10 +140,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T13:02:56.614Z",
+  "CreatedAt": "2026-10-08T14:04:56.957Z",
   "Release": {
-    "Id": "Releases-50147",
-    "Name": "1.0.47",
-    "Version": "1.0.47"
+    "Id": "Releases-50146",
+    "Name": "1.0.4",
+    "Version": "1.0.4"
   }
 }
