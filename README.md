@@ -13,12 +13,10 @@ ends in `-demo` and in `cmfleet` and `jeffreypalermo-sites`.**
   no edits from the Octopus UI, so no Platform Hub GitHub App connection is made.
 - **Policies.** Four are published and active; all warn and block nothing: `prod_has_sign_off` **1.2.0**,
   `prod_db_change_has_restore_point` **1.1.0**, `app_deployment_has_health_check` **1.1.0** and
-  `rollback_has_health_check` **1.0.0**, all published from commit d602f0b on 2026-10-08 by the operator through the
-  API and activated then. The earlier versions (sign-off 1.1.0 and 1.0.0, the other two 1.0.0) are published and no
-  longer active; their scope was the `-demo` spaces, and `churchbulletin` for the first two. Octopus accepted
+  `rollback_has_health_check` **1.1.0**, published on 2026-10-08 by the operator through the API and activated then
+  (the first three from commit d602f0b, the rollback policy from 5a22cc2). The earlier versions (sign-off 1.1.0 and
+  1.0.0, the others 1.0.0) are published and no longer active; their scope was the `-demo` spaces, and `churchbulletin` for the first two. Octopus accepted
   `startswith`, which the new policy is the first to call.
-- **To publish** (2026-10-08, the operator, once this is on `main`): `rollback_has_health_check` **1.1.0**, the
-  policy without its exemption, then activated. Until then 1.0.0, with the exemption, is the active version.
 - **Seen at work in a fleet space** (2026-10-08, `cmfleet`, ServerTasks-11997784, cmfleet-dashboard 1.0.27 to prod):
   under "Apply compliance policies" the task logs, at Info level and with no warning, "Compliant with policy" for
   all four: the health check, the restore point ("No database change runs in this deployment."), the sign-off, and
@@ -280,8 +278,7 @@ Plan phase 1, then phase 3 for the policies; phase 2 (the spike) comes before an
    `prod_db_change_has_restore_point` 1.1.0, `app_deployment_has_health_check` 1.1.0, `rollback_has_health_check`
    1.0.0): the same two calls for each, with `GitRef` `refs/heads/main`; activating a version takes the earlier one
    out of use. The new policy's Rego calls `startswith`, and Octopus accepted it.
-   **Next, not done** (2026-10-08): publish and activate `rollback_has_health_check` 1.1.0, the policy without the
-   exemption of `cmdemo3-demo`.
+   Done the same day for `rollback_has_health_check` 1.1.0, the policy without the exemption of `cmdemo3-demo`.
 5. **Templates (phase 4).** After the spike: publish `cmdemo-process-template` 1.0.0 as a pre-release, share it with the canary
    space only, and remove its DRAFT mark here.
 
