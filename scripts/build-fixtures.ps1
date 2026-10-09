@@ -11,8 +11,9 @@
     -Method Get. The fixtures hold names, IDs, slugs, action types and flags: no variable value, no step property
     value, no secret.
 
-    For each space, the most recent deployment of each project to the environment prod, and each out-of-scope case
-    (-OutOfScope), becomes fixtures/<space slug>/<project slug>.<environment slug>.json: the policy input that
+    For each space, the most recent deployment of each project to the environment prod, each deployment to another
+    environment (-OtherEnvironment) and each out-of-scope case (-OutOfScope) becomes
+    fixtures/<space slug>/<project slug>.<environment slug>.json: the policy input that
     https://octopus.com/docs/platform-hub/policies/schema documents, checked against schema/policy-input.schema.json
     (the JSON schema of that page). fixtures/manifest.json lists every fixture with its deployment, release, task state
     and process source, and the projects that have no such deployment.
@@ -32,10 +33,17 @@ param(
     # The demo-environment kit's library (Read-DemoConfig, Invoke-OctopusApi) and a demo file that names the instance.
     [string] $DemoCommon = (Join-Path $HOME 'demo-environment-kit' '.claude' 'skills' 'demo-environment' 'scripts' 'demo-common.ps1'),
     [string] $DemoFile = (Join-Path $HOME 'demo-environment-kit' 'fleet' 'systems' 'cmdemo1.json'),
-    # The spaces: cmdemo1 demo, cmdemo2 demo, cmdemo3 demo, the fleet's two systems whose space has another name
-    # (cmfleet; "JeffreyPalermo - Sites" of jpcom), and the bootcamp's ChurchBulletin.
-    [string[]] $SpaceId = @('Spaces-355', 'Spaces-356', 'Spaces-357', 'Spaces-378', 'Spaces-375', 'Spaces-315'),
+    # The spaces: cmdemo1 demo, cmdemo2 demo, cmdemo3 demo, the fleet's systems whose space has another name
+    # (cmfleet; "JeffreyPalermo - Sites" of jpcom; biblefleet and "Adam and woman in the garden of Eden" of adameve, the
+    # two spaces of the Bible fleet), and the bootcamp's ChurchBulletin.
+    [string[]] $SpaceId = @('Spaces-355', 'Spaces-356', 'Spaces-357', 'Spaces-378', 'Spaces-375', 'Spaces-396', 'Spaces-395', 'Spaces-315'),
     [string] $Environment = 'prod',
+    # Deployments to another environment, each <space id>/<project slug>/<environment slug>: the latest deployment
+    # there. The two health check policies apply to every environment, and adameve has no environment prod yet.
+    [string[]] $OtherEnvironment = @(
+        'Spaces-396/biblefleet-dashboard/tdd', 'Spaces-396/biblefleet-dashboard/uat',
+        'Spaces-395/adameve-system/tdd', 'Spaces-395/adameve-web/tdd'
+    ),
     # Out-of-scope cases, each <space id>/<project slug>/<environment slug>: the latest deployment there.
     [string[]] $OutOfScope = @('Spaces-355/cmdemo1-ui/tdd'),
     [string] $Output = (Join-Path (Split-Path -Parent $PSScriptRoot) 'fixtures')
@@ -223,6 +231,7 @@ function Get-SystemName {
     if ($Space.Slug -like '*-demo') { return $Space.Slug.Substring(0, $Space.Slug.Length - '-demo'.Length) }
     if ($Space.Slug -eq 'churchbulletin') { return 'bootcamp' }
     if ($Space.Slug -eq 'jeffreypalermo-sites') { return 'jpcom' }
+    if ($Space.Slug -eq 'adam-and-woman-in-the-garden-of-eden') { return 'adameve' }
     return $Space.Slug
 }
 
@@ -317,6 +326,11 @@ foreach ($space in $SpaceId) {
     foreach ($project in @(Get-Cached "/api/$space/projects/all") | Sort-Object Slug) {
         $cases.Add([pscustomobject]@{ SpaceId = $space; Project = $project.Slug; Environment = $Environment; Purpose = "latest $Environment deployment" })
     }
+}
+foreach ($case in $OtherEnvironment) {
+    $parts = $case -split '/'
+    if ($parts.Count -ne 3) { throw "-OtherEnvironment '$case': <space id>/<project slug>/<environment slug>." }
+    $cases.Add([pscustomobject]@{ SpaceId = $parts[0]; Project = $parts[1]; Environment = $parts[2]; Purpose = "latest $($parts[2]) deployment" })
 }
 foreach ($case in $OutOfScope) {
     $parts = $case -split '/'

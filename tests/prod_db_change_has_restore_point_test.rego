@@ -34,11 +34,18 @@ test_prod_in_the_two_named_spaces_of_the_fleet_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, pin, update], [])
 }
 
+test_prod_in_the_two_spaces_of_the_bible_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("biblefleet", "prod", [sign_off, update], [])
+	policy.evaluate with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", [sign_off, pin, update], [])
+}
+
 test_other_environments_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo", "tdd", kit, [])
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "tdd", [dbup, update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmfleet", "uat", [migrate], [])
 	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo-sites", "tdd", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("biblefleet", "uat", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", [migrate], [])
 }
 
 test_other_spaces_are_out_of_scope if {
@@ -46,6 +53,8 @@ test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("training", "prod", [migrate], [])
 	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [migrate], [])
 	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("biblefleet-archive", "prod", [migrate], [])
+	policy.evaluate == false with input as policy_input.deployment("adam-and-woman", "prod", [migrate], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
@@ -90,6 +99,18 @@ test_a_step_in_parallel_between_them_keeps_the_order if {
 test_a_named_space_without_a_database_change_is_allowed if {
 	result := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, pin, update], [])
 	result == {"allowed": true, "reason": "No database change runs in this deployment."}
+}
+
+test_the_spaces_of_the_bible_fleet_without_a_database_change_are_allowed if {
+	dashboard := policy.result with input as policy_input.deployment("biblefleet", "prod", [sign_off, update], [])
+	dashboard == {"allowed": true, "reason": "No database change runs in this deployment."}
+	adameve := policy.result with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", [sign_off, pin, update], [])
+	adameve == {"allowed": true, "reason": "No database change runs in this deployment."}
+}
+
+test_a_database_change_with_no_restore_point_in_a_space_of_the_bible_fleet_violates if {
+	result := policy.result with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", [sign_off, migrate, update], [])
+	result.allowed == false
 }
 
 # Violations

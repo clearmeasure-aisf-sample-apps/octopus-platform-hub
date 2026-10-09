@@ -17,6 +17,13 @@ ends in `-demo` and in `cmfleet` and `jeffreypalermo-sites`.**
   (the first three from commit d602f0b, the rollback policy from 5a22cc2). The earlier versions (sign-off 1.1.0 and
   1.0.0, the others 1.0.0) are published and no longer active; their scope was the `-demo` spaces, and `churchbulletin` for the first two. Octopus accepted
   `startswith`, which the new policy is the first to call.
+- **Not published yet: the two spaces of the Bible fleet.** The files of this repository bring `biblefleet`
+  (Spaces-396) and `adam-and-woman-in-the-garden-of-eden` (Spaces-395, the system adameve) into the scope of all
+  four policies (decision 2026-10-09, Jeffrey). Octopus still runs the versions named above, which do not see those
+  two spaces. The next versions carry the change: `prod_has_sign_off` **1.3.0**,
+  `prod_db_change_has_restore_point` **1.2.0**, `app_deployment_has_health_check` **1.2.0** and
+  `rollback_has_health_check` **1.2.0**; the operator publishes and activates them after the merge, and this status
+  says so then. In the preview no deployment of either space violates a policy.
 - **Seen at work in a fleet space** (2026-10-08, `cmfleet`, ServerTasks-11997784, cmfleet-dashboard 1.0.27 to prod):
   under "Apply compliance policies" the task logs, at Info level and with no warning, "Compliant with policy" for
   all four: the health check, the restore point ("No database change runs in this deployment."), the sign-off, and
@@ -57,12 +64,15 @@ ends in `-demo` and in `cmfleet` and `jeffreypalermo-sites`.**
 | cmdemo3 | `cmdemo3 demo` (Spaces-357, slug `cmdemo3-demo`) | all four | the same |
 | cmfleet | `cmfleet` (Spaces-378, slug `cmfleet`), project `cmfleet-dashboard` | all four, by the name of the space | none planned: its process is made by hand |
 | jpcom | `JeffreyPalermo - Sites` (Spaces-375, slug `jeffreypalermo-sites`), projects `jpcom-system`, `jpcom-web` and `jpcom-dashboard` | all four, by the name of the space | not decided |
+| biblefleet | `biblefleet` (Spaces-396, slug `biblefleet`), project `biblefleet-dashboard`; environments tdd, uat and prod | all four, by the name of the space; not published yet | none planned: its process is made by hand |
+| adameve | `Adam and woman in the garden of Eden` (Spaces-395, slug `adam-and-woman-in-the-garden-of-eden`), projects `adameve-system` and `adameve-web`; environment tdd only | all four, by the name of the space; not published yet. With no environment `prod`, only the two health checks see a deployment today | not decided |
 | bootcamp | `ChurchBulletin` (Spaces-315, slug `churchbulletin`), project `ChurchBulletin-gh` | the sign-off, from which it is exempt, and the restore point; neither health check | only if its owners adopt them (D6) |
 
 The policies apply to every space whose slug ends in `-demo` (the demo-environment kit names each space
-`<slug> demo`), so a new demo system joins with no change here; to the two systems of the fleet whose space has
-another name, by the slug of that space (`cmfleet` and `jeffreypalermo-sites`, the set `fleet_spaces` in each
-policy's scope; decision 2026-10-08, Jeffrey); and, for the sign-off and the restore point, to `churchbulletin`. No
+`<slug> demo`), so a new demo system joins with no change here; to the systems whose space has another name, by
+the slug of that space (the set `fleet_spaces` in each policy's scope: `cmfleet` and `jeffreypalermo-sites`,
+decision 2026-10-08, Jeffrey; `biblefleet` and `adam-and-woman-in-the-garden-of-eden`, the two spaces of the Bible
+fleet, decision 2026-10-09, Jeffrey); and, for the sign-off and the restore point, to `churchbulletin`. No
 other space of the instance is in their scope: a space joins by name, with a change here (its slug in
 `fleet_spaces` of each policy, a test, its fixtures) and a new version of each policy. The column says what the
 files of this repository hold; what Octopus has published is in the status above.
@@ -122,8 +132,9 @@ policy version.
 | [`rollback_has_health_check`](.octopus/policies/rollback_has_health_check.ocl) "Deploy - A rollback has a health check" | A deployment, to any environment, in which a rollback step runs asks the application's health after it: a step whose slug starts with `verify-` (the kit's `verify-revert`) that is enabled, not skipped, comes after the last rollback step and starts once that step has finished. A rollback step is `revert-deployable`; `revert-pin` is one too where Argo CD deploys what the pin says, which the policy reads from the step `update-deployable` having an action type that starts with `Octopus.ArgoCD` (runtime aks-argocd, `Octopus.ArgoCDUpdateImageTags`). In every other process `revert-pin` only makes Git say again what runs, and is no rollback. A deployment in which no rollback step runs complies ("No rollback step runs in this deployment."). The fleet's decisions 0018 and 0022 in the demo-environment kit. Warn mode | None since 1.1.0. `cmdemo3-demo` was exempt in 1.0.0, for its releases made before its process had the step `verify-revert` (the kit's commit 8ebb204); such a release gets the warning if it is deployed again. The bootcamp's space is out of scope: its process has no rollback step |
 
 - **Scope**: deployments, not runbook runs (`not input.Runbook`), in a space whose slug ends in `-demo` or is in the
-  set `fleet_spaces` (`cmfleet`, `jeffreypalermo-sites`). The sign-off and the restore point: to the environment
-  `prod` only, and in the space `churchbulletin` as well. The two health checks: to every environment.
+  set `fleet_spaces` (`cmfleet`, `jeffreypalermo-sites`, `biblefleet`, `adam-and-woman-in-the-garden-of-eden`).
+  The sign-off and the restore point: to the environment `prod` only, and in the space `churchbulletin` as well.
+  The two health checks: to every environment.
 - **Rego**: Rego v1, as the documentation's examples write it: the keywords `if`, `in` and `contains` with no import,
   the rules `evaluate` (scope) and `result` (conditions), and a result of the documented
   [output schema](https://octopus.com/docs/platform-hub/policies/schema#output-schema): `allowed`, `reason`, `action`.
@@ -203,11 +214,23 @@ revert. A fixture is the process its deployment ran; their releases before those
 before the processes got that step (the kit's commit 8ebb204, 2026-10-08) and were exempt while the policy had its
 exemption. With the fixtures of this day both rows read plain "allowed" before the exemption was taken out.
 
+The two spaces of the Bible fleet, on 2026-10-09 (the fixtures of that day; the numbers above are those of
+2026-10-08): every deployment complies and none would get a warning. `biblefleet-dashboard` 1.0.1, to tdd, uat and
+prod: Update deployable, then Verify deployable; no database change and no rollback step; in prod its Sign-off
+runs. adameve has the environment tdd only, so the sign-off and the restore point do not see it yet:
+`adameve-system` 1.0.3 updates no application, and `adameve-web` 1.0.9 has Update deployable, then Verify
+deployable, and Revert deployable, then Verify revert. Every release of the three projects carries the same steps
+as the one in its fixture (read from Octopus on that day: three, two and one releases). When adameve gets its
+environment prod, both projects have a Sign-off that leaves out tdd only, and neither has a step that changes a
+database.
+
 ## Fixtures
 
-`scripts/build-fixtures.ps1` builds them; the operator runs it, with GET requests only. For each of the six spaces,
-the most recent prod deployment of each project becomes `fixtures/<space slug>/<project slug>.prod.json`, and the
-latest tdd deployment of cmdemo1-ui is the out-of-scope case. Each file is the policy input as documented, checked
+`scripts/build-fixtures.ps1` builds them; the operator runs it, with GET requests only. For each of the eight
+spaces, the most recent prod deployment of each project becomes `fixtures/<space slug>/<project slug>.prod.json`;
+the latest deployment to another environment is added where the script names it (`-OtherEnvironment`: tdd and uat of
+`biblefleet-dashboard`, and tdd of the two projects of adameve, which has no prod), and the latest tdd deployment
+of cmdemo1-ui is the out-of-scope case. Each file is the policy input as documented, checked
 against [schema/policy-input.schema.json](schema/policy-input.schema.json) (the JSON schema of the
 [schema page](https://octopus.com/docs/platform-hub/policies/schema), docs commit 12eaec8, 2026-09-29).
 [fixtures/manifest.json](fixtures/manifest.json) names each fixture's deployment, release, task state and process.

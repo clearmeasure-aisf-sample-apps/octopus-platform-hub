@@ -1,29 +1,29 @@
 {
   "Environment": {
-    "Id": "Environments-627",
-    "Name": "prod",
-    "Slug": "prod",
+    "Id": "Environments-681",
+    "Name": "tdd",
+    "Slug": "tdd",
     "Tags": []
   },
   "Project": {
-    "Id": "Projects-1024",
-    "Name": "cmdemo3-status",
-    "Slug": "cmdemo3-status",
+    "Id": "Projects-1041",
+    "Name": "adameve-system",
+    "Slug": "adameve-system",
     "Tags": []
   },
   "Space": {
-    "Id": "Spaces-357",
-    "Name": "cmdemo3 demo",
-    "Slug": "cmdemo3-demo"
+    "Id": "Spaces-395",
+    "Name": "Adam and woman in the garden of Eden",
+    "Slug": "adam-and-woman-in-the-garden-of-eden"
   },
   "ProjectGroup": {
-    "Id": "ProjectGroups-779",
-    "Name": "cmdemo3",
-    "Slug": "cmdemo3"
+    "Id": "ProjectGroups-815",
+    "Name": "adameve",
+    "Slug": "adameve"
   },
   "Steps": [
     {
-      "Id": "695b9440-44ae-45d6-b2ab-c153d15a90e2",
+      "Id": "d290dd69-cfc2-4092-b799-f5de8baba2a1",
       "Slug": "sign-off",
       "ActionType": "Octopus.Manual",
       "Enabled": true,
@@ -36,8 +36,8 @@
       "Packages": []
     },
     {
-      "Id": "1f3b547b-1f14-4962-a6d1-a5af10185c44",
-      "Slug": "update-deployable",
+      "Id": "78158a04-4949-413f-a32a-2ccf063be0e1",
+      "Slug": "apply-environment",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
       "IsRequired": false,
@@ -48,11 +48,11 @@
       },
       "Packages": [
         {
-          "Id": "18644ad9-ea73-42b4-8e4d-a33b93931d4d",
-          "Name": "cmdemo3-status",
-          "Version": "1.0.12",
+          "Id": "148adb09-bd7d-466e-bb30-67d0bdad3d12",
+          "Name": "adameve-system",
+          "Version": "1.0.3",
           "Feed": {
-            "Id": "Feeds-1855",
+            "Id": "Feeds-1887",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -62,9 +62,9 @@
       ]
     },
     {
-      "Id": "9d588bff-4f2d-4678-b4e4-d7de9c84cdf2",
-      "Slug": "verify-deployable",
-      "ActionType": "Octopus.Script",
+      "Id": "136b0acb-5e84-4977-811b-7bd44fcbacf2",
+      "Slug": "verify-environment",
+      "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
       "IsRequired": false,
       "IsConditional": false,
@@ -80,32 +80,32 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "695b9440-44ae-45d6-b2ab-c153d15a90e2"
+        "d290dd69-cfc2-4092-b799-f5de8baba2a1"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "1f3b547b-1f14-4962-a6d1-a5af10185c44"
+        "78158a04-4949-413f-a32a-2ccf063be0e1"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "9d588bff-4f2d-4678-b4e4-d7de9c84cdf2"
+        "136b0acb-5e84-4977-811b-7bd44fcbacf2"
       ]
     }
   ],
   "RequiresApproval": false,
   "Actor": {
-    "Id": "Users-781",
-    "Username": "ai-ops",
-    "Type": "Agent"
+    "Id": "Users-866",
+    "Username": "adameve-github",
+    "Type": "ServiceAccount"
   },
-  "CreatedAt": "2026-10-09T01:22:09.014Z",
+  "CreatedAt": "2026-10-09T05:59:58.819Z",
   "Release": {
-    "Id": "Releases-50202",
-    "Name": "1.0.12",
-    "Version": "1.0.12"
+    "Id": "Releases-50227",
+    "Name": "1.0.3",
+    "Version": "1.0.3"
   }
 }

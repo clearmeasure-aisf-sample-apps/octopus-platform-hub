@@ -22,12 +22,19 @@ test_prod_in_the_two_named_spaces_of_the_fleet_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, update], [])
 }
 
+test_prod_in_the_two_spaces_of_the_bible_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("biblefleet", "prod", [sign_off, update], [])
+	policy.evaluate with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", [sign_off, update], [])
+}
+
 test_other_environments_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo", "tdd", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo", "uat", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "uat", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmfleet", "tdd", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo-sites", "uat", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("biblefleet", "uat", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", [update], [])
 }
 
 test_other_spaces_are_out_of_scope if {
@@ -36,6 +43,8 @@ test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo-archive", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("biblefleet-archive", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("adam-and-woman", "prod", [update], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
@@ -102,6 +111,13 @@ test_the_exemption_does_not_cover_the_named_spaces if {
 	cmfleet.allowed == false
 	jpcom := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", [update], [])
 	jpcom.allowed == false
+}
+
+test_the_exemption_does_not_cover_the_spaces_of_the_bible_fleet if {
+	dashboard := policy.result with input as policy_input.deployment("biblefleet", "prod", [update], [])
+	dashboard.allowed == false
+	adameve := policy.result with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", [update], [])
+	adameve.allowed == false
 }
 
 test_the_bootcamp_is_exempt if {
