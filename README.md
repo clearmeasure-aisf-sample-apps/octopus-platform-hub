@@ -11,19 +11,15 @@ ends in `-demo` and in `cmfleet` and `jeffreypalermo-sites`.**
   protected and **no credentials**: the repository is public, so Octopus only reads. Nothing can be saved from the
   Octopus UI; a policy or a template changes here, by pull request. That is the decision (Jeffrey, 2026-10-07):
   no edits from the Octopus UI, so no Platform Hub GitHub App connection is made.
-- **Policies.** Four are published and active; all warn and block nothing: `prod_has_sign_off` **1.2.0**,
-  `prod_db_change_has_restore_point` **1.1.0**, `app_deployment_has_health_check` **1.1.0** and
-  `rollback_has_health_check` **1.1.0**, published on 2026-10-08 by the operator through the API and activated then
-  (the first three from commit d602f0b, the rollback policy from 5a22cc2). The earlier versions (sign-off 1.1.0 and
-  1.0.0, the others 1.0.0) are published and no longer active; their scope was the `-demo` spaces, and `churchbulletin` for the first two. Octopus accepted
-  `startswith`, which the new policy is the first to call.
-- **Not published yet: the two spaces of the Bible fleet.** The files of this repository bring `biblefleet`
-  (Spaces-396) and `adam-and-woman-in-the-garden-of-eden` (Spaces-395, the system adameve) into the scope of all
-  four policies (decision 2026-10-09, Jeffrey). Octopus still runs the versions named above, which do not see those
-  two spaces. The next versions carry the change: `prod_has_sign_off` **1.3.0**,
+- **Policies.** Four are published and active; all warn and block nothing: `prod_has_sign_off` **1.3.0**,
   `prod_db_change_has_restore_point` **1.2.0**, `app_deployment_has_health_check` **1.2.0** and
-  `rollback_has_health_check` **1.2.0**; the operator publishes and activates them after the merge, and this status
-  says so then. In the preview no deployment of either space violates a policy.
+  `rollback_has_health_check` **1.2.0**, published on 2026-10-09 by the operator through the API from commit 5cd7560
+  and activated then. They bring the two spaces of the Bible fleet into the scope of all four: `biblefleet`
+  (Spaces-396) and `adam-and-woman-in-the-garden-of-eden` (Spaces-395, the system adameve) (decision 2026-10-09,
+  Jeffrey). In the preview no deployment of either space violates a policy. The earlier versions are published and
+  no longer active: sign-off 1.2.0 and the others 1.1.0 (2026-10-08: the `-demo` spaces, `cmfleet` and
+  `jeffreypalermo-sites`), and before them sign-off 1.1.0 and 1.0.0 and the others 1.0.0 (the `-demo` spaces, and
+  `churchbulletin` for the first two). Octopus accepted `startswith`, which the rollback policy was the first to call.
 - **Seen at work in a fleet space** (2026-10-08, `cmfleet`, ServerTasks-11997784, cmfleet-dashboard 1.0.27 to prod):
   under "Apply compliance policies" the task logs, at Info level and with no warning, "Compliant with policy" for
   all four: the health check, the restore point ("No database change runs in this deployment."), the sign-off, and
