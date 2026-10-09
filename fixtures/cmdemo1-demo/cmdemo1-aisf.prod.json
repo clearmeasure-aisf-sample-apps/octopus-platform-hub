@@ -127,10 +127,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T18:04:02.014Z",
+  "CreatedAt": "2026-10-08T19:52:45.217Z",
   "Release": {
-    "Id": "Releases-50168",
-    "Name": "1.0.13",
-    "Version": "1.0.13"
+    "Id": "Releases-50177",
+    "Name": "1.0.14",
+    "Version": "1.0.14"
   }
 }

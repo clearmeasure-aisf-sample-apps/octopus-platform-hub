@@ -76,7 +76,7 @@
         {
           "Id": "1ea4e0b0-ceb6-4421-bb4b-177476fa27a6",
           "Name": "ChurchBulletin.Database",
-          "Version": "2.4.68",
+          "Version": "2.4.75",
           "Feed": {
             "Id": "Feeds-1847",
             "Name": "Octopus Server (built-in)",
@@ -115,7 +115,7 @@
         {
           "Id": "5193fe77-5a19-49a6-bb05-4945aa60833b",
           "Name": "ChurchBulletin.AcceptanceTests",
-          "Version": "2.4.68",
+          "Version": "2.4.75",
           "Feed": {
             "Id": "Feeds-1847",
             "Name": "Octopus Server (built-in)",
@@ -193,7 +193,7 @@
         {
           "Id": "12dd11e8-180a-4030-b17e-de2db4d890a9",
           "Name": "ChurchBulletin.AcceptanceTests",
-          "Version": "2.4.68",
+          "Version": "2.4.75",
           "Feed": {
             "Id": "Feeds-1847",
             "Name": "Octopus Server (built-in)",
@@ -295,14 +295,14 @@
   ],
   "RequiresApproval": false,
   "Actor": {
-    "Id": "Users-782",
-    "Username": "cmdemo1-github",
-    "Type": "ServiceAccount"
+    "Id": "Users-781",
+    "Username": "ai-ops",
+    "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T15:27:26.649Z",
+  "CreatedAt": "2026-10-09T02:35:47.373Z",
   "Release": {
-    "Id": "Releases-50158",
-    "Name": "2.4.68",
-    "Version": "2.4.68"
+    "Id": "Releases-50204",
+    "Name": "2.4.75",
+    "Version": "2.4.75"
   }
 }

@@ -30,6 +30,14 @@ test_every_environment_of_the_two_named_spaces_of_the_fleet_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", [update, verify], [])
 }
 
+test_every_environment_of_the_two_spaces_of_the_bible_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("biblefleet", "tdd", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("biblefleet", "uat", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("biblefleet", "prod", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", [update, verify], [])
+	policy.evaluate with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", [update, verify], [])
+}
+
 test_the_bootcamp_space_is_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "prod", [update], [])
 }
@@ -39,6 +47,8 @@ test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo-archive", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [update], [])
 	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("biblefleet-archive", "prod", [update], [])
+	policy.evaluate == false with input as policy_input.deployment("adam-and-woman", "prod", [update], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
@@ -79,6 +89,32 @@ test_the_processes_of_the_named_spaces_comply if {
 test_no_health_check_in_a_named_space_violates if {
 	result := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "tdd", [pin, update], [])
 	result.allowed == false
+}
+
+# The processes of the two spaces of the Bible fleet, as they were on 2026-10-09.
+test_the_processes_of_the_spaces_of_the_bible_fleet_comply if {
+	sign_off := policy_input.step("sign-off-id", "sign-off", "Octopus.Manual")
+	biblefleet_dashboard := [sign_off, update, verify, policy_input.step("run-tests-id", "run-acceptance-tests", "Octopus.AzurePowerShell")]
+	policy.result == {"allowed": true} with input as policy_input.deployment("biblefleet", "prod", biblefleet_dashboard, [])
+	adameve_web := [
+		sign_off, pin, update, verify,
+		policy_input.step("record-id", "record-nodes", "Octopus.Script"),
+		policy_input.step("revert-id", "revert-deployable", "Octopus.AzurePowerShell"),
+		policy_input.step("verify-revert-id", "verify-revert", "Octopus.AzurePowerShell"),
+		policy_input.step("record-after-id", "record-nodes-after-revert", "Octopus.Script"),
+		policy_input.step("revert-pin-id", "revert-pin", "Octopus.Script"),
+	]
+	policy.result == {"allowed": true} with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", adameve_web, [])
+	adameve_system := [sign_off, apply, verify_environment]
+	system := policy.result with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", adameve_system, [])
+	system == {"allowed": true, "reason": "No application is deployed in this deployment."}
+}
+
+test_no_health_check_in_a_space_of_the_bible_fleet_violates if {
+	dashboard := policy.result with input as policy_input.deployment("biblefleet", "uat", [update], [])
+	dashboard.allowed == false
+	adameve := policy.result with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", [pin, update], [])
+	adameve.allowed == false
 }
 
 # Violations

@@ -31,6 +31,12 @@ jpcom_dashboard := [sign_off, pin, update, verify, revert_pin]
 
 cmfleet_dashboard := [sign_off, update, verify, policy_input.step("run-tests-id", "run-acceptance-tests", "Octopus.Script")]
 
+# The processes of the two spaces of the Bible fleet on 2026-10-09: biblefleet-dashboard is a copy of cmfleet-dashboard,
+# and adameve-web has the steps of jpcom-web.
+biblefleet_dashboard := [sign_off, update, verify, policy_input.step("run-tests-id", "run-acceptance-tests", "Octopus.AzurePowerShell")]
+
+adameve_web := jpcom_web
+
 # A cluster project of runtime aks-argocd since the kit's commit 8ebb204 (cmdemo3), and the process its releases
 # made before that carry.
 aks := [sign_off, pin, argo_update, verify, revert_pin, verify_revert]
@@ -52,6 +58,14 @@ test_every_environment_of_the_two_named_spaces_of_the_fleet_is_in_scope if {
 	policy.evaluate with input as policy_input.deployment("jeffreypalermo-sites", "prod", jpcom_web, [])
 }
 
+test_every_environment_of_the_two_spaces_of_the_bible_fleet_is_in_scope if {
+	policy.evaluate with input as policy_input.deployment("biblefleet", "tdd", biblefleet_dashboard, [])
+	policy.evaluate with input as policy_input.deployment("biblefleet", "uat", biblefleet_dashboard, [])
+	policy.evaluate with input as policy_input.deployment("biblefleet", "prod", biblefleet_dashboard, [])
+	policy.evaluate with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", adameve_web, [])
+	policy.evaluate with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "prod", adameve_web, [])
+}
+
 test_the_bootcamp_space_is_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("churchbulletin", "prod", [update, revert], [])
 }
@@ -61,6 +75,8 @@ test_other_spaces_are_out_of_scope if {
 	policy.evaluate == false with input as policy_input.deployment("cmdemo1-demo-archive", "prod", [update, revert], [])
 	policy.evaluate == false with input as policy_input.deployment("cmfleet-archive", "prod", [update, revert], [])
 	policy.evaluate == false with input as policy_input.deployment("jeffreypalermo", "prod", [update, revert], [])
+	policy.evaluate == false with input as policy_input.deployment("biblefleet-archive", "prod", [update, revert], [])
+	policy.evaluate == false with input as policy_input.deployment("adam-and-woman", "prod", [update, revert], [])
 }
 
 test_runbook_runs_are_out_of_scope if {
@@ -97,6 +113,17 @@ test_a_process_without_a_rollback_step_complies if {
 	verify_environment := policy_input.step("verify-environment-id", "verify-environment", "Octopus.AzurePowerShell")
 	system := policy.result with input as policy_input.deployment("jeffreypalermo-sites", "prod", [sign_off, apply, verify_environment], [])
 	system == {"allowed": true, "reason": "No rollback step runs in this deployment."}
+}
+
+test_the_processes_of_the_spaces_of_the_bible_fleet_comply if {
+	dashboard := policy.result with input as policy_input.deployment("biblefleet", "prod", biblefleet_dashboard, [])
+	dashboard == {"allowed": true, "reason": "No rollback step runs in this deployment."}
+	policy.result == {"allowed": true} with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", adameve_web, [])
+}
+
+test_a_rollback_with_no_health_check_in_a_space_of_the_bible_fleet_violates if {
+	result := policy.result with input as policy_input.deployment("adam-and-woman-in-the-garden-of-eden", "tdd", [pin, update, verify, record, revert, record_after, revert_pin], [])
+	result.allowed == false
 }
 
 test_a_skipped_or_disabled_rollback_is_no_rollback if {

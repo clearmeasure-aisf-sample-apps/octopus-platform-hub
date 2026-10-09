@@ -1,29 +1,29 @@
 {
   "Environment": {
-    "Id": "Environments-669",
-    "Name": "prod",
-    "Slug": "prod",
+    "Id": "Environments-683",
+    "Name": "uat",
+    "Slug": "uat",
     "Tags": []
   },
   "Project": {
-    "Id": "Projects-1033",
-    "Name": "cmfleet-dashboard",
-    "Slug": "cmfleet-dashboard",
+    "Id": "Projects-1043",
+    "Name": "biblefleet-dashboard",
+    "Slug": "biblefleet-dashboard",
     "Tags": []
   },
   "Space": {
-    "Id": "Spaces-378",
-    "Name": "cmfleet",
-    "Slug": "cmfleet"
+    "Id": "Spaces-396",
+    "Name": "biblefleet",
+    "Slug": "biblefleet"
   },
   "ProjectGroup": {
-    "Id": "ProjectGroups-799",
-    "Name": "cmfleet",
-    "Slug": "cmfleet-1"
+    "Id": "ProjectGroups-817",
+    "Name": "biblefleet",
+    "Slug": "biblefleet-1"
   },
   "Steps": [
     {
-      "Id": "f17cd148-c707-427f-93fd-8980f9e11709",
+      "Id": "c4dc33de-728c-4430-8c88-b89617e09a2b",
       "Slug": "sign-off",
       "ActionType": "Octopus.Manual",
       "Enabled": true,
@@ -36,7 +36,7 @@
       "Packages": []
     },
     {
-      "Id": "8ce9b3b4-2413-4b8c-89e5-23c67f9f9de9",
+      "Id": "a499b48b-196d-4207-866d-8e48ac576439",
       "Slug": "update-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -48,11 +48,11 @@
       },
       "Packages": [
         {
-          "Id": "1ca6a900-9c71-4075-8817-8fe71d624354",
-          "Name": "cmfleet-dashboard",
-          "Version": "1.0.37",
+          "Id": "211e255e-b1d0-4463-982b-02c1c67d614a",
+          "Name": "biblefleet-dashboard",
+          "Version": "1.0.1",
           "Feed": {
-            "Id": "Feeds-1875",
+            "Id": "Feeds-1891",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -62,7 +62,7 @@
       ]
     },
     {
-      "Id": "838469b5-3f20-4a9a-a298-9b15d1ef9033",
+      "Id": "4e7041b3-8a4b-4979-a314-5abfddb1a34e",
       "Slug": "verify-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -74,11 +74,11 @@
       },
       "Packages": [
         {
-          "Id": "1312fe9e-258e-434b-8cc7-e3e57924fd48",
-          "Name": "cmfleet-dashboard",
-          "Version": "1.0.37",
+          "Id": "7676951b-b79d-4a75-a33e-481a18e7b264",
+          "Name": "biblefleet-dashboard",
+          "Version": "1.0.1",
           "Feed": {
-            "Id": "Feeds-1875",
+            "Id": "Feeds-1891",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -88,7 +88,7 @@
       ]
     },
     {
-      "Id": "4cc509e5-91e8-4519-9cb4-4844ec4ce895",
+      "Id": "ae7305b2-bc8e-4d83-a0b4-45978bcbb7c2",
       "Slug": "run-acceptance-tests",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -100,11 +100,11 @@
       },
       "Packages": [
         {
-          "Id": "28f87b94-c93a-47c2-97ec-120899b9f702",
-          "Name": "cmfleet-dashboard",
-          "Version": "1.0.37",
+          "Id": "0a4c3373-65da-4186-bc7a-a096f1c0bbc2",
+          "Name": "biblefleet-dashboard",
+          "Version": "1.0.1",
           "Feed": {
-            "Id": "Feeds-1875",
+            "Id": "Feeds-1891",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -119,25 +119,25 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "f17cd148-c707-427f-93fd-8980f9e11709"
+        "c4dc33de-728c-4430-8c88-b89617e09a2b"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "8ce9b3b4-2413-4b8c-89e5-23c67f9f9de9"
+        "a499b48b-196d-4207-866d-8e48ac576439"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "838469b5-3f20-4a9a-a298-9b15d1ef9033"
+        "4e7041b3-8a4b-4979-a314-5abfddb1a34e"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "4cc509e5-91e8-4519-9cb4-4844ec4ce895"
+        "ae7305b2-bc8e-4d83-a0b4-45978bcbb7c2"
       ]
     }
   ],
@@ -147,10 +147,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-09T02:38:38.961Z",
+  "CreatedAt": "2026-10-09T05:49:17.469Z",
   "Release": {
-    "Id": "Releases-50208",
-    "Name": "1.0.37",
-    "Version": "1.0.37"
+    "Id": "Releases-50226",
+    "Name": "1.0.1",
+    "Version": "1.0.1"
   }
 }

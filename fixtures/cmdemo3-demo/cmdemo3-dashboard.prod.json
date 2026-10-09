@@ -50,7 +50,7 @@
         {
           "Id": "0759ea56-2cea-4aab-acf8-2cd96bf6bd2f",
           "Name": "cmdemo3/dashboard",
-          "Version": "1.0.15",
+          "Version": "1.0.16",
           "Feed": {
             "Id": "Feeds-1859",
             "Name": "acr-cmdemo3",
@@ -179,10 +179,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T17:44:55.942Z",
+  "CreatedAt": "2026-10-08T23:31:00.469Z",
   "Release": {
-    "Id": "Releases-50166",
-    "Name": "1.0.15",
-    "Version": "1.0.15"
+    "Id": "Releases-50190",
+    "Name": "1.0.16",
+    "Version": "1.0.16"
   }
 }

@@ -1,29 +1,29 @@
 {
   "Environment": {
-    "Id": "Environments-663",
-    "Name": "prod",
-    "Slug": "prod",
+    "Id": "Environments-681",
+    "Name": "tdd",
+    "Slug": "tdd",
     "Tags": []
   },
   "Project": {
-    "Id": "Projects-1023",
-    "Name": "jpcom-web",
-    "Slug": "jpcom-web",
+    "Id": "Projects-1042",
+    "Name": "adameve-web",
+    "Slug": "adameve-web",
     "Tags": []
   },
   "Space": {
-    "Id": "Spaces-375",
-    "Name": "JeffreyPalermo - Sites",
-    "Slug": "jeffreypalermo-sites"
+    "Id": "Spaces-395",
+    "Name": "Adam and woman in the garden of Eden",
+    "Slug": "adam-and-woman-in-the-garden-of-eden"
   },
   "ProjectGroup": {
-    "Id": "ProjectGroups-795",
-    "Name": "jpcom",
-    "Slug": "jpcom"
+    "Id": "ProjectGroups-815",
+    "Name": "adameve",
+    "Slug": "adameve"
   },
   "Steps": [
     {
-      "Id": "f9160e41-0bc5-4991-95f3-eaa03f50cacf",
+      "Id": "3d5b8ceb-79f7-4b67-8ce4-156d55269cbc",
       "Slug": "sign-off",
       "ActionType": "Octopus.Manual",
       "Enabled": true,
@@ -36,7 +36,7 @@
       "Packages": []
     },
     {
-      "Id": "348c89e5-f1fa-4026-8c5f-321dbc6d6fc3",
+      "Id": "b8cbd116-0f1d-4fbd-b624-2a68f7b4f4a9",
       "Slug": "pin-version",
       "ActionType": "Octopus.Script",
       "Enabled": true,
@@ -49,7 +49,7 @@
       "Packages": []
     },
     {
-      "Id": "2d8dc6f4-f0c1-4c84-a348-f71ff559beea",
+      "Id": "ad6c30a3-a82b-4afd-951b-fa6e67ff7536",
       "Slug": "update-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -61,11 +61,11 @@
       },
       "Packages": [
         {
-          "Id": "eb6a931c-8c13-4ff8-9bd0-0a5bc6b92607",
-          "Name": "jpcom-web",
-          "Version": "1.0.69",
+          "Id": "f232e0d0-0c01-45b5-b995-ca9583c234eb",
+          "Name": "adameve-web",
+          "Version": "1.0.9",
           "Feed": {
-            "Id": "Feeds-1867",
+            "Id": "Feeds-1887",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "Id": "37252459-7585-473a-ae70-cad4c88e7e8c",
+      "Id": "a0b10141-f131-4440-bbca-da88f5af8b7b",
       "Slug": "verify-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -87,11 +87,11 @@
       },
       "Packages": [
         {
-          "Id": "ae386881-d019-45cb-9f5c-07e734d925c5",
-          "Name": "jpcom-web",
-          "Version": "1.0.69",
+          "Id": "c5ac1df7-b80d-456d-9412-1896a399cefe",
+          "Name": "adameve-web",
+          "Version": "1.0.9",
           "Feed": {
-            "Id": "Feeds-1867",
+            "Id": "Feeds-1887",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -101,7 +101,7 @@
       ]
     },
     {
-      "Id": "2e9ec3b1-9cfa-4555-9f00-86fb4ee7e529",
+      "Id": "67601754-926f-4e60-8414-535253a18083",
       "Slug": "record-nodes",
       "ActionType": "Octopus.Script",
       "Enabled": true,
@@ -114,7 +114,7 @@
       "Packages": []
     },
     {
-      "Id": "9646d9eb-f753-4c23-8195-5843c9b9f1a4",
+      "Id": "c5551b3b-a289-45de-b4a6-d9da2b9df8f6",
       "Slug": "revert-deployable",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -126,11 +126,11 @@
       },
       "Packages": [
         {
-          "Id": "3f6bef02-b2d2-4849-8d55-4fc4435aa535",
-          "Name": "jpcom-web",
-          "Version": "1.0.69",
+          "Id": "05c2d6d3-1fb0-4fac-bc9c-5c264cd0500c",
+          "Name": "adameve-web",
+          "Version": "1.0.9",
           "Feed": {
-            "Id": "Feeds-1867",
+            "Id": "Feeds-1887",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -140,7 +140,7 @@
       ]
     },
     {
-      "Id": "a739a90b-446c-4887-8732-33201cbeffad",
+      "Id": "d2205bf6-f20f-46f9-ab68-00aff522361b",
       "Slug": "verify-revert",
       "ActionType": "Octopus.AzurePowerShell",
       "Enabled": true,
@@ -152,11 +152,11 @@
       },
       "Packages": [
         {
-          "Id": "5822fb17-c099-4f15-b663-6a94f17f4e82",
-          "Name": "jpcom-web",
-          "Version": "1.0.69",
+          "Id": "83962243-e454-46f8-af94-9e95e807b18c",
+          "Name": "adameve-web",
+          "Version": "1.0.9",
           "Feed": {
-            "Id": "Feeds-1867",
+            "Id": "Feeds-1887",
             "Name": "Octopus Server (built-in)",
             "Slug": "octopus-server-built-in",
             "Type": "BuiltIn",
@@ -166,7 +166,7 @@
       ]
     },
     {
-      "Id": "f26cf0a6-2b4f-4577-9560-01b7a23b1dd0",
+      "Id": "d2f635d8-97e4-457c-af6f-28f90c5b3df7",
       "Slug": "record-nodes-after-revert",
       "ActionType": "Octopus.Script",
       "Enabled": true,
@@ -179,7 +179,7 @@
       "Packages": []
     },
     {
-      "Id": "ce84192e-efe0-4df9-a41b-6de043b951a2",
+      "Id": "d05a7a41-5268-453e-b939-a3839cea7045",
       "Slug": "revert-pin",
       "ActionType": "Octopus.Script",
       "Enabled": true,
@@ -197,68 +197,68 @@
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "f9160e41-0bc5-4991-95f3-eaa03f50cacf"
+        "3d5b8ceb-79f7-4b67-8ce4-156d55269cbc"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "348c89e5-f1fa-4026-8c5f-321dbc6d6fc3"
+        "b8cbd116-0f1d-4fbd-b624-2a68f7b4f4a9"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "2d8dc6f4-f0c1-4c84-a348-f71ff559beea"
+        "ad6c30a3-a82b-4afd-951b-fa6e67ff7536"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "37252459-7585-473a-ae70-cad4c88e7e8c"
+        "a0b10141-f131-4440-bbca-da88f5af8b7b"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "2e9ec3b1-9cfa-4555-9f00-86fb4ee7e529"
+        "67601754-926f-4e60-8414-535253a18083"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "9646d9eb-f753-4c23-8195-5843c9b9f1a4"
+        "c5551b3b-a289-45de-b4a6-d9da2b9df8f6"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "a739a90b-446c-4887-8732-33201cbeffad"
+        "d2205bf6-f20f-46f9-ab68-00aff522361b"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "f26cf0a6-2b4f-4577-9560-01b7a23b1dd0"
+        "d2f635d8-97e4-457c-af6f-28f90c5b3df7"
       ]
     },
     {
       "StartTrigger": "StartAfterPrevious",
       "Steps": [
-        "ce84192e-efe0-4df9-a41b-6de043b951a2"
+        "d05a7a41-5268-453e-b939-a3839cea7045"
       ]
     }
   ],
   "RequiresApproval": false,
   "Actor": {
-    "Id": "Users-781",
-    "Username": "ai-ops",
-    "Type": "Agent"
+    "Id": "Users-866",
+    "Username": "adameve-github",
+    "Type": "ServiceAccount"
   },
-  "CreatedAt": "2026-10-09T02:17:18.873Z",
+  "CreatedAt": "2026-10-09T06:20:24.284Z",
   "Release": {
-    "Id": "Releases-50200",
-    "Name": "1.0.69",
-    "Version": "1.0.69"
+    "Id": "Releases-50229",
+    "Name": "1.0.9",
+    "Version": "1.0.9"
   }
 }

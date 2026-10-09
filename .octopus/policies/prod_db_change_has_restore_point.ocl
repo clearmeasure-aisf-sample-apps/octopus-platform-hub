@@ -1,5 +1,5 @@
 name = "Deploy - Production database change has a restore point"
-description = "A production deployment of the demo systems (spaces whose slug ends in -demo), of the systems cmfleet and jpcom (spaces cmfleet and jeffreypalermo-sites) or of the bootcamp (space churchbulletin) that changes a database schema (step migrate-database or run-db-migrations, or the process template kit-migrate-database) records a restore point first (step record-restore-point, or the process template kit-record-restore-point), finished before the first change. Steps that change data but not the schema (for example Set employee middle names, Initialize database) are not database changes (decision 2026-10-05). Warn mode first (decision D5). No space is exempt: cmdemo3, once exempt, records a restore point since cmdemo3-system #14."
+description = "A production deployment of the demo systems (spaces whose slug ends in -demo), of the systems cmfleet, jpcom, biblefleet and adameve (spaces cmfleet, jeffreypalermo-sites, biblefleet and adam-and-woman-in-the-garden-of-eden) or of the bootcamp (space churchbulletin) that changes a database schema (step migrate-database or run-db-migrations, or the process template kit-migrate-database) records a restore point first (step record-restore-point, or the process template kit-record-restore-point), finished before the first change. Steps that change data but not the schema (for example Set employee middle names, Initialize database) are not database changes (decision 2026-10-05). Warn mode first (decision D5). No space is exempt: cmdemo3, once exempt, records a restore point since cmdemo3-system #14."
 violation_action = "warn"
 violation_reason = "A production database change needs a restore point recorded before it."
 
@@ -159,7 +159,7 @@ scope {
             package prod_db_change_has_restore_point
 
             # Deployments to prod in the spaces of the kit's demo systems (the kit names each space "<slug> demo", so
-            # its slug ends in -demo), of the fleet's two systems named below and in the bootcamp's space ChurchBulletin.
+            # its slug ends in -demo), of the fleet's systems named below and in the bootcamp's space ChurchBulletin.
             # Runbook runs are out of scope, and so is every other space of the instance.
             default evaluate := false
 
@@ -170,8 +170,10 @@ scope {
             }
 
             # The systems of the fleet whose space has another name, by the slug of that space: cmfleet (the fleet health
-            # dashboard) and jeffreypalermo-sites (jpcom; its space is "JeffreyPalermo - Sites"). A space joins by name here.
-            fleet_spaces := {"cmfleet", "jeffreypalermo-sites"}
+            # dashboard), jeffreypalermo-sites (jpcom; its space is "JeffreyPalermo - Sites"), and the two spaces of the Bible
+            # fleet: biblefleet (its fleet health dashboard) and adam-and-woman-in-the-garden-of-eden (adameve; its space is
+            # "Adam and woman in the garden of Eden"). A space joins by name here.
+            fleet_spaces := {"cmfleet", "jeffreypalermo-sites", "biblefleet", "adam-and-woman-in-the-garden-of-eden"}
 
             in_scope_space if endswith(input.Space.Slug, "-demo")
 

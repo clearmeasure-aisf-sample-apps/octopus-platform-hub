@@ -63,7 +63,7 @@
         {
           "Id": "1013731e-0352-42cf-90ff-05b3e1096bd8",
           "Name": "cmdemo2-dashboard",
-          "Version": "1.0.30",
+          "Version": "1.0.39",
           "Feed": {
             "Id": "Feeds-1851",
             "Name": "Octopus Server (built-in)",
@@ -140,10 +140,10 @@
     "Username": "ai-ops",
     "Type": "Agent"
   },
-  "CreatedAt": "2026-10-08T05:16:40.557Z",
+  "CreatedAt": "2026-10-09T04:39:38.651Z",
   "Release": {
-    "Id": "Releases-50119",
-    "Name": "1.0.30",
-    "Version": "1.0.30"
+    "Id": "Releases-50223",
+    "Name": "1.0.39",
+    "Version": "1.0.39"
   }
 }

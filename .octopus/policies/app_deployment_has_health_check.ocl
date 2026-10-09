@@ -1,5 +1,5 @@
 name = "Deploy - Application deployment has a health check"
-description = "Every deployment of an application of the demo systems (spaces whose slug ends in -demo) and of the systems cmfleet and jpcom (spaces cmfleet and jeffreypalermo-sites), to any environment, asks the deployed application's health endpoint after the application is updated: a step verify-deployable that is enabled, not skipped, and starts after the last step update-deployable has finished. A deployment that updates no application (a system project) complies. Warn mode first (decision D5). The bootcamp's space is out of scope: its process has no health check step."
+description = "Every deployment of an application of the demo systems (spaces whose slug ends in -demo) and of the systems cmfleet, jpcom, biblefleet and adameve (spaces cmfleet, jeffreypalermo-sites, biblefleet and adam-and-woman-in-the-garden-of-eden), to any environment, asks the deployed application's health endpoint after the application is updated: a step verify-deployable that is enabled, not skipped, and starts after the last step update-deployable has finished. A deployment that updates no application (a system project) complies. Warn mode first (decision D5). The bootcamp's space is out of scope: its process has no health check step."
 violation_action = "warn"
 violation_reason = "An application deployment needs a health check after the application is updated."
 
@@ -134,7 +134,7 @@ scope {
             package app_deployment_has_health_check
 
             # Deployments to every environment in the spaces of the kit's demo systems (the kit names each space
-            # "<slug> demo", so its slug ends in -demo) and of the fleet's two systems named below. Runbook runs are out of
+            # "<slug> demo", so its slug ends in -demo) and of the fleet's systems named below. Runbook runs are out of
             # scope, and so is every other space of the instance. The bootcamp's space is not in scope: its process has no
             # health check step, and its owners decide whether to add one.
             default evaluate := false
@@ -145,8 +145,10 @@ scope {
             }
 
             # The systems of the fleet whose space has another name, by the slug of that space: cmfleet (the fleet health
-            # dashboard) and jeffreypalermo-sites (jpcom; its space is "JeffreyPalermo - Sites"). A space joins by name here.
-            fleet_spaces := {"cmfleet", "jeffreypalermo-sites"}
+            # dashboard), jeffreypalermo-sites (jpcom; its space is "JeffreyPalermo - Sites"), and the two spaces of the Bible
+            # fleet: biblefleet (its fleet health dashboard) and adam-and-woman-in-the-garden-of-eden (adameve; its space is
+            # "Adam and woman in the garden of Eden"). A space joins by name here.
+            fleet_spaces := {"cmfleet", "jeffreypalermo-sites", "biblefleet", "adam-and-woman-in-the-garden-of-eden"}
 
             in_scope_space if endswith(input.Space.Slug, "-demo")
 
